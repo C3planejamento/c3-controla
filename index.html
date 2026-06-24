@@ -211,6 +211,9 @@ button,input,select,textarea{font-family:inherit}
   #printhead .ph-co{font-family:'Oswald',sans-serif;font-weight:700;font-size:21px;color:#13244a}
   #printhead .ph-ob{font-size:12px;color:#333;margin-top:2px}
   #printhead .ph-r{margin-left:auto;text-align:right;font-size:11px;color:#333;line-height:1.5}
+  [id^="crono_"],[id^="fin_"]{display:block!important}
+  .crow{break-inside:avoid;border:1px solid #ccc!important}
+  .ch{cursor:default!important}
 }
 /* RESPONSIVO */
 @media(max-width:900px){
@@ -773,11 +776,12 @@ function cronoEtapas(d,sp,fase){
   return '<table class="tbl" style="font-size:11.5px"><thead><tr><th>Junta</th>'+th+'</tr></thead><tbody>'+rows+'</tbody></table>';
 }
 function cronoToggle(did,cod){window._cronoOpen=window._cronoOpen||{};var k=did+'|'+cod;var el=document.getElementById('crono_'+k);if(el){var show=el.style.display==='none';el.style.display=show?'block':'none';window._cronoOpen[k]=show;}}
+function spoolProgramado(sp,fase){var jc=fase==='campo';return (sp.juntas||[]).some(function(j){return ((j.tipo||'J').toUpperCase()==='JC')===jc && !j.fora && j.pv && Object.keys(j.pv).length>0;});}
 function renderCrono(fase){fase=fase||'fab';
   var des=window._cronoDes||(DB.desenhos[0]&&DB.desenhos[0].id);
   var d=DB.desenhos.find(function(x){return x.id===des;})||DB.desenhos[0];if(!d)return '';
   var opts=DB.desenhos.map(function(x){return '<option value="'+x.id+'"'+(x.id===d.id?' selected':'')+'>'+x.cod+' — '+x.desc+' ('+(x.spools||[]).length+' spools)</option>';}).join('');
-  var sps=(d.spools||[]).map(function(sp){var nJ=spJuntasTipo(sp,false).length,nJC=spJuntasTipo(sp,true).length;var peso=Math.round(pesoSpool(sp));var k=d.id+'|'+sp.cod;var open=(window._cronoOpen&&window._cronoOpen[k]);
+  var sps=(d.spools||[]).filter(function(sp){return spoolProgramado(sp,fase);}).map(function(sp){var nJ=spJuntasTipo(sp,false).length,nJC=spJuntasTipo(sp,true).length;var peso=Math.round(pesoSpool(sp));var k=d.id+'|'+sp.cod;var open=(window._cronoOpen&&window._cronoOpen[k]);
     return '<div class="crow"><div class="ch" onclick="cronoToggle(\''+d.id+'\',\''+sp.cod+'\')">'+
       '<span class="cc">'+sp.cod+'</span>'+
       '<span class="cm">'+d.desc+'</span>'+
@@ -787,7 +791,7 @@ function renderCrono(fase){fase=fase||'fab';
       '<span class="cm">PD '+pd(sp)+'</span>'+
       '<span style="margin-left:auto;font-family:var(--disp);font-weight:700">'+spoolPct(sp)+'%</span>'+
       '</div><div id="crono_'+k+'" style="display:'+(open?'block':'none')+';margin-top:9px">'+cronoEtapas(d,sp,fase)+'</div></div>';
-  }).join('')||'<div class="empty">Sem spools.</div>';
+  }).join('')||'<div class="empty">Nenhum spool programado nesta linha no período (defina período e equipe).</div>';
   return '<div class="panel"><h3>Cronograma por junta — '+(fase==='campo'?'Montagem':'Fabricação')+' <span style="font-size:12px;color:var(--muted);font-family:var(--body)">datas previstas por junta, distribuídas no período conforme a equipe (clique no spool)</span></h3>'+
     '<div style="margin-bottom:10px">Isométrico / linha: <select onchange="window._cronoDes=this.value;go(\'prog\')" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 9px;max-width:100%">'+opts+'</select></div>'+sps+'</div>';
 }
