@@ -429,7 +429,7 @@ function renderPainel(){
   var revPend=DB.desenhos.filter(function(d){return d.status==='rev';}).length;
   var avFab=pdTot?Math.round(pdFab/pdTot*100):0,avCampo=pdTot?Math.round(pdCampo/pdTot*100):0;
   var k='<div class="kpis">'+
-    kpi('or',nD,'Desenhos')+kpi('bl',nS,'Spools')+kpi('',Math.round(pdTot),'PD total (pol)')+
+    kpi('or',nD,'Desenhos')+kpi('bl',nS,'Spools')+kpi('',sp.reduce(function(a,x){return a+((x.sp.juntas&&x.sp.juntas.length)||0);},0),'Juntas')+
     kpi('am',avFab+'%','Fabricação')+kpi('am',avCampo+'%','Montagem')+
     kpi('ok',conc,'Concluídos')+kpi('rd',revPend,'Rev. pendente')+'</div>';
   /* avanço por desenho */
@@ -476,6 +476,27 @@ function lineEtapasHTML(did,kind,ets){var d=DB.desenhos.find(function(x){return 
     var bar='<div class="bar '+(p>=100?'full':'')+'" style="'+(ed?'flex:1 1 90px':'flex:1')+'"><i style="width:'+p+'%"></i></div>';
     return '<div class="etapa"><div class="eh"><span class="en">'+et+'</span><span class="ep" style="color:'+(p>=100?'var(--ok)':'var(--muted)')+'">'+p+'%</span></div><div class="erow">'+bar+btns+'<div class="fld"><label>Data realizada</label><input type="date" value="'+(r.real||'')+'" '+(ed?'':'disabled')+' onchange="setLineEtData(\''+did+'\',\''+kind+'\',\''+etx+'\',this.value)"></div></div></div>';
   }).join('');
+}
+function linhaMontada(d){var ss=d.spools||[];if(!ss.length)return false;return ss.every(function(sp){return fasePct(sp,'campo')>=100;});}
+function montagemPct(d){var ss=d.spools||[];if(!ss.length)return 0;return Math.round(ss.reduce(function(a,sp){return a+fasePct(sp,'campo');},0)/ss.length);}
+function setLinePrev(did,kind,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});var o=lineObj(d,kind);var r=o.et[et]||(o.et[et]={});r.prev=val;persist();}
+function lineCronoHTML(did,kind,ets){var d=DB.desenhos.find(function(x){return x.id===did;});var o=lineObj(d,kind);var ed=podeEditar();
+  return '<table class="tbl" style="font-size:12px"><thead><tr><th>Etapa</th><th>Prevista</th><th>Realizada</th><th>%</th></tr></thead><tbody>'+ets.map(function(et){var r=o.et[et]||{};var p=r.pct||0;var etx=et.replace(/'/g,"\\'");var done=p>=100;var atras=r.prev&&!done&&r.prev<hoje();var st=done?'<span class="badge b-ok">100%</span>':atras?'<span class="badge b-late">atrasada</span>':p>0?'<span class="badge b-run">'+p+'%</span>':'<span class="badge b-new">'+p+'%</span>';return '<tr><td class="tg">'+et+'</td><td>'+(ed?'<input type="date" value="'+(r.prev||'')+'" onchange="setLinePrev(\''+did+'\',\''+kind+'\',\''+etx+'\',this.value)" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:6px;padding:3px 6px;font-size:12px">':fmtBR(r.prev))+'</td><td>'+fmtBR(r.real)+'</td><td>'+st+'</td></tr>';}).join('')+'</tbody></table>';
+}
+function cronoToggle2(k){window._cronoOpen=window._cronoOpen||{};var el=document.getElementById('fin_'+k);if(el){var show=el.style.display==='none';el.style.display=show?'block':'none';window._cronoOpen['fin'+k]=show;}}
+function renderFinalProg(){
+  var libs=DB.desenhos.filter(linhaMontada).length;
+  var supPct=Math.round(DB.desenhos.reduce(function(a,d){return a+linePct(d,'suportes',SUP_ET);},0)/(DB.desenhos.length||1));
+  var testePct=Math.round(DB.desenhos.reduce(function(a,d){return a+linePct(d,'teste',TESTE_ET);},0)/(DB.desenhos.length||1));
+  var kp='<div class="kpis">'+kpi('or',DB.desenhos.length,'Linhas')+kpi('ok',libs,'Montagem 100%')+kpi('am',supPct+'%','Suportes')+kpi('bl',testePct+'%','Teste hidrostático')+'</div>';
+  var cards=DB.desenhos.map(function(d){
+    var mp=montagemPct(d);var lib=linhaMontada(d);var k=d.id;var open=window._cronoOpen&&window._cronoOpen['fin'+k];
+    var sup=linePct(d,'suportes',SUP_ET),tst=linePct(d,'teste',TESTE_ET);
+    var head='<div class="ch"'+(lib?' onclick="cronoToggle2(\''+k+'\')" style="cursor:pointer"':'')+'><span class="cc">'+d.cod+'</span><span class="cm">'+d.desc+'</span><span class="cm">Montagem '+mp+'%</span>'+(lib?'<span class="badge b-ok">Liberada</span><span class="cm">Sup '+sup+'% · Teste '+tst+'%</span>':'<span class="badge b-late">aguardando montagem ('+mp+'%)</span>')+'</div>';
+    var body=lib?'<div id="fin_'+k+'" style="display:'+(open?'block':'none')+';margin-top:9px"><h3 style="font-size:13px;margin:4px 0">Suportes ('+(lineObj(d,'suportes').n||0)+')</h3>'+lineCronoHTML(d.id,'suportes',SUP_ET)+'<h3 style="font-size:13px;margin:10px 0 4px">Teste hidrostático</h3>'+lineCronoHTML(d.id,'teste',TESTE_ET)+'</div>':'';
+    return '<div class="crow">'+head+body+'</div>';
+  }).join('');
+  return kp+'<div class="panel"><h3>Suportes e Teste Hidrostático <span style="font-size:12px;color:var(--muted);font-family:var(--body)">por linha — liberados só com a montagem da linha 100%</span></h3>'+cards+'</div>';
 }
 function abrirDesenho(id){
   var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;
@@ -671,70 +692,85 @@ function pesoSpool(sp){return compr(sp)*kgm(sp.dn||6);}
 function _pad2(x){return String(x).padStart(2,'0');}
 function addDias(s,n){if(!s)return '';var d=new Date(s+'T00:00:00');d.setDate(d.getDate()+(n||0));return d.getFullYear()+'-'+_pad2(d.getMonth()+1)+'-'+_pad2(d.getDate());}
 function diasUteis(ini,fim,sem){if(!ini||!fim)return 0;var a=new Date(ini+'T00:00:00'),b=new Date(fim+'T00:00:00');var dc=Math.round((b-a)/86400000);if(dc<0)return 0;return Math.max(0,Math.round((dc+1)*((sem||6)/7)));}
-function escopoProg(){var o={J:0,JC:0,pdJ:0,pdJC:0,peso:0,nsp:0,Jsold:0,JCsold:0};allSpools().forEach(function(x){var sp=x.sp;o.nsp++;o.peso+=pesoSpool(sp);(sp.juntas||[]).forEach(function(j){var jc=(j.tipo||'J').toUpperCase()==='JC';var sld=j[JST[SOLDA_IDX]];if(jc){o.JC++;o.pdJC+=j.dn||0;if(sld)o.JCsold++;}else{o.J++;o.pdJ+=j.dn||0;if(sld)o.Jsold++;}});});o.pdJ=Math.round(o.pdJ);o.pdJC=Math.round(o.pdJC);o.peso=Math.round(o.peso);return o;}
-function progGet(){if(!DB.prog)DB.prog={};var P=DB.prog;if(P.sem==null)P.sem=6;if(P.lag==null)P.lag=1;['fab','campo'].forEach(function(g){var def=g==='fab'?{cald:8,sold:6,insp:20}:{cald:6,sold:4,insp:16};var nd=g==='fab'?{cald:3,sold:4,insp:1}:{cald:2,sold:3,insp:1};if(!P[g])P[g]={};var c=P[g];if(c.ini==null)c.ini=g==='fab'?hoje():'';if(c.fim==null)c.fim=DB.meta.prazo||'';['cald','sold','insp'].forEach(function(r){if(!c[r]||typeof c[r]!=='object')c[r]={n:nd[r],prod:def[r]};});});return P;}
-function setProg(grp,key,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var P=progGet();if(grp==='sem'){P.sem=parseInt(val)||6;}else if(grp==='lag'){P.lag=Math.max(0,parseFloat(val)||0);}else{P[grp][key]=val;}persist();go('prog');}
-function setProgEq(grp,role,key,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var P=progGet();P[grp][role][key]=parseFloat(val)||0;persist();go('prog');}
+function escopoProg(){var o={J:0,JC:0,pdJ:0,pdJC:0,pdJs:0,pdJCs:0,peso:0,nsp:0,Jsold:0,JCsold:0};allSpools().forEach(function(x){var sp=x.sp;o.nsp++;o.peso+=pesoSpool(sp);(sp.juntas||[]).forEach(function(j){var jc=(j.tipo||'J').toUpperCase()==='JC';var sld=j[JST[SOLDA_IDX]];if(jc){o.JC++;o.pdJC+=j.dn||0;if(sld){o.JCsold++;o.pdJCs+=j.dn||0;}}else{o.J++;o.pdJ+=j.dn||0;if(sld){o.Jsold++;o.pdJs+=j.dn||0;}}});});o.pdJ=Math.round(o.pdJ);o.pdJC=Math.round(o.pdJC);o.pdJs=Math.round(o.pdJs);o.pdJCs=Math.round(o.pdJCs);o.peso=Math.round(o.peso);return o;}
+function progGet(){if(!DB.prog)DB.prog={};var P=DB.prog;
+  if(P.pv!==2){ /* migra p/ modelo PD por turno (prod = polegada-diâmetro por turno por profissional) */
+    P.sem=P.sem||6;P.lag=(P.lag==null?1:P.lag);P.turnos=1;
+    ['fab','campo'].forEach(function(g){var def=g==='fab'?{cald:24,sold:16,insp:60}:{cald:20,sold:14,insp:50};var nd=g==='fab'?{cald:3,sold:4,insp:1}:{cald:2,sold:3,insp:1};var old=P[g]||{};P[g]={ini:old.ini||(g==='fab'?hoje():''),fim:old.fim||(DB.meta.prazo||''),cald:{n:nd.cald,prod:def.cald},sold:{n:nd.sold,prod:def.sold},insp:{n:nd.insp,prod:def.insp}};});
+    P.pv=2;
+  }
+  if(P.turnos==null)P.turnos=1;
+  return P;
+}
+function setProg(grp,key,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var P=progGet();
+  if(grp==='sem'){P.sem=parseInt(val)||6;}else if(grp==='lag'){P.lag=Math.max(0,parseFloat(val)||0);}else if(grp==='turnos'){P.turnos=Math.max(1,parseInt(val)||1);}else{P[grp][key]=val;}
+  if(grp==='fab'||grp==='campo'){if(P[grp].ini&&P[grp].fim)distribuirDatas(grp,true);}else{['fab','campo'].forEach(function(g){if(P[g].ini&&P[g].fim)distribuirDatas(g,true);});}
+  persist();go('prog');}
+function setProgEq(grp,role,key,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var P=progGet();P[grp][role][key]=parseFloat(val)||0;if(P[grp].ini&&P[grp].fim)distribuirDatas(grp,true);persist();go('prog');}
 function fmtD(d){return _pad2(d.getDate())+'/'+_pad2(d.getMonth()+1);}
 function contaSold(jc,dt){var c=0;allSpools().forEach(function(x){(x.sp.juntas||[]).forEach(function(j){var isjc=(j.tipo||'J').toUpperCase()==='JC';if(isjc===jc&&j[JST[SOLDA_IDX]]){var d=j.sldDate;if(!d||new Date(d+'T00:00:00')<=dt)c++;}});});return c;}
 function semanas(cfg,juntasTotal,jc){if(!cfg.ini||!cfg.fim)return [];var a=new Date(cfg.ini+'T00:00:00'),b=new Date(cfg.fim+'T00:00:00');var totalDays=Math.round((b-a)/86400000)+1;if(totalDays<=0)return [];var nW=Math.ceil(totalDays/7);var metaW=juntasTotal/nW;var arr=[];var hojeD=new Date(hoje()+'T00:00:00');for(var w=0;w<nW;w++){var wi=new Date(a);wi.setDate(a.getDate()+w*7);var we=new Date(a);we.setDate(a.getDate()+(w+1)*7-1);if(we>b)we=new Date(b);var acumPrev=Math.min(juntasTotal,metaW*(w+1));arr.push({n:w+1,ini:fmtD(wi),fim:fmtD(we),meta:Math.round(metaW),acumPrev:Math.round(acumPrev),acumReal:contaSold(jc,we),futuro:wi>hojeD,weEnd:we});}return arr;}
 function curveS(weeks,total){if(!weeks.length||!total)return '<div class="vsub">Defina início e fim para ver a curva S.</div>';var n=weeks.length;var X=function(i){return (n>1?(i/(n-1))*100:0);};var Yp=function(v){return 100-(v/total*100);};var prev='0,100 '+weeks.map(function(w,i){return X(i)+','+Yp(w.acumPrev);}).join(' ');var hojeD=new Date(hoje()+'T00:00:00');var realPts=['0,100'];weeks.forEach(function(w,i){if(w.weEnd<=hojeD)realPts.push(X(i)+','+Yp(w.acumReal));});var real=realPts.join(' ');return '<div style="position:relative;height:210px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:10px;margin-top:6px"><svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width:100%;height:100%"><line x1="0" y1="0" x2="0" y2="100" stroke="var(--line)" stroke-width="0.5"/><line x1="0" y1="100" x2="100" y2="100" stroke="var(--line)" stroke-width="0.5"/><line x1="0" y1="50" x2="100" y2="50" stroke="var(--line)" stroke-width="0.3" stroke-dasharray="1.5 1.5"/><polyline points="'+prev+'" fill="none" stroke="#2b75e4" stroke-width="1" vector-effect="non-scaling-stroke"/>'+(realPts.length>1?'<polyline points="'+real+'" fill="none" stroke="#1f9d4d" stroke-width="1.4" vector-effect="non-scaling-stroke"/>':'')+'</svg><div style="position:absolute;top:6px;right:12px;font-size:11px;font-weight:600"><span style="color:#2b75e4">━ Previsto</span> &nbsp; <span style="color:#1f9d4d">━ Realizado</span></div></div>';}
 function semanaTbl(weeks){if(!weeks.length)return '';var rows=weeks.map(function(w){return '<tr><td class="tg">S'+w.n+'</td><td>'+w.ini+' a '+w.fim+'</td><td>'+w.meta+'</td><td>'+w.acumPrev+'</td><td>'+(w.futuro?'—':w.acumReal)+'</td></tr>';}).join('');return '<div style="max-height:300px;overflow:auto;margin-top:6px"><table class="tbl"><thead><tr><th>Semana</th><th>Período</th><th>Meta juntas</th><th>Acum. previsto</th><th>Acum. realizado</th></tr></thead><tbody>'+rows+'</tbody></table></div>';}
-function distribuirDatas(fase){
-  if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}
+function distribuirDatas(fase,auto){
+  if(!podeEditar()){if(!auto)toast('Modo visualização: edição bloqueada');return;}
   var P=progGet();var cfg=fase==='campo'?P.campo:P.fab;
-  if(!cfg.ini||!cfg.fim){toast('Defina início e fim da fase primeiro');return;}
-  if(!confirm('Preencher/sobrescrever as datas previstas das etapas de '+(fase==='campo'?'Montagem':'Fabricação')+', distribuídas no período conforme o efetivo?'))return;
-  var jc=fase==='campo';var which=jc?'campo':'fab';var ets=jc?CAMPO_ET:FAB_ET;
-  var caps=['cald','sold','insp'].map(function(r){return (cfg[r].n||0)*(cfg[r].prod||0);});
-  var cap=Math.max(1,Math.min.apply(null,caps));var diasSemana=P.sem||6;var lag=Math.max(0,P.lag||1);
-  var lista=[];DB.desenhos.forEach(function(d){(d.spools||[]).forEach(function(sp){lista.push(sp);});});
-  var cursorJ=0;
-  lista.forEach(function(sp){
-    var nj=Math.max(1,spJuntasTipo(sp,jc).length);var startW=cursorJ/cap;cursorJ+=nj;
-    var o=sp[which]||(sp[which]={});
-    ets.forEach(function(et,i){var dayW=startW+i*lag;var cal=Math.round(dayW*(7/diasSemana));var dt=addDias(cfg.ini,cal);if(dt>cfg.fim)dt=cfg.fim;var r=o[et]||(o[et]={});r.prev=dt;});
-  });
-  persist();go('prog');toast('Datas previstas distribuídas no período ✓');
+  if(!cfg.ini||!cfg.fim){if(!auto)toast('Defina início e fim da fase');return;}
+  if(!auto && !confirm('Distribuir as datas POR JUNTA de '+(fase==='campo'?'Montagem':'Fabricação')+' conforme a capacidade da equipe no período?'))return;
+  var jc=fase==='campo';
+  var capPD=Math.max(1,Math.min.apply(null,['cald','sold','insp'].map(function(r){return (cfg[r].n||0)*(cfg[r].prod||0)*(P.turnos||1);})));
+  var diasSemana=P.sem||6;var lag=Math.max(0,P.lag||1);var dU=diasUteis(cfg.ini,cfg.fim,diasSemana);
+  var cursorPD=0;
+  DB.desenhos.forEach(function(d){(d.spools||[]).forEach(function(sp){(sp.juntas||[]).forEach(function(j){
+    if(((j.tipo||'J').toUpperCase()==='JC')!==jc)return;
+    var startW=cursorPD/capPD;cursorPD+=(j.dn||0);j.pv={};
+    if(startW>dU){j.fora=true;return;}
+    j.fora=false;
+    for(var i=0;i<6;i++){var dayW=startW+i*lag;var cal=Math.round(dayW*(7/diasSemana));var dt=addDias(cfg.ini,cal);if(dt>cfg.fim)dt=cfg.fim;j.pv[i]=dt;}
+  });});});
+  persist();if(!auto){go('prog');toast('Datas distribuídas por junta (dentro da capacidade) ✓');}
 }
 function renderProgramacao(){
   var P=progGet();var e=escopoProg();var ed=podeEditar();
   var inp=function(grp,key,val,type){return '<input '+(ed?'':'disabled')+' type="'+(type||'number')+'" value="'+(val||'')+'" onchange="setProg(\''+grp+'\',\''+key+'\',this.value)" style="width:100%;max-width:160px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 8px;font-size:13px">';};
   var inpEq=function(grp,role,key,val){return '<input '+(ed?'':'disabled')+' type="number" min="0" value="'+(val||0)+'" onchange="setProgEq(\''+grp+'\',\''+role+'\',\''+key+'\',this.value)" style="width:84px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 8px;font-size:13px">';};
   var fase=window._progFase||'fab';var cfg=fase==='campo'?P.campo:P.fab;var isC=fase==='campo';var faseNome=isC?'Montagem — Campo':'Fabricação — Pipe Shop';
-  var toggle='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn'+(fase==='fab'?'':' ghost')+'" onclick="window._progFase=\'fab\';go(\'prog\')">⚙ Fabricação (Pipe Shop)</button><button class="btn'+(isC?'':' ghost')+'" onclick="window._progFase=\'campo\';go(\'prog\')">🏗 Montagem (Campo)</button></div>';
-  var params='<div class="panel"><h3>Período — '+faseNome+'</h3><table class="tbl"><thead><tr><th>Início</th><th>Fim (prazo)</th><th>Dias úteis/semana</th><th>Defasagem (dias entre etapas)</th></tr></thead><tbody><tr><td>'+inp(fase,'ini',cfg.ini,'date')+'</td><td>'+inp(fase,'fim',cfg.fim,'date')+'</td><td>'+inp('sem','sem',P.sem)+'</td><td>'+inp('lag','lag',P.lag)+'</td></tr></tbody></table></div>';
-  var dias=diasUteis(cfg.ini,cfg.fim,P.sem);var juntas=isC?e.JC:e.J,jsold=isC?e.JCsold:e.Jsold,pd=isC?e.pdJC:e.pdJ;
-  var weeks=semanas(cfg,juntas,isC);var req=dias?Math.ceil(juntas/dias):0;
+  var toggle='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap"><button class="btn'+(fase==='fab'?'':' ghost')+'" onclick="window._progFase=\'fab\';go(\'prog\')">⚙ Fabricação</button><button class="btn'+(fase==='campo'?'':' ghost')+'" onclick="window._progFase=\'campo\';go(\'prog\')">🏗 Montagem</button><button class="btn'+(fase==='final'?'':' ghost')+'" onclick="window._progFase=\'final\';go(\'prog\')">🔩 Suportes / Teste</button></div>';
+  if(fase==='final'){return '<div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir programação</button></div>'+toggle+renderFinalProg();}
+  var params='<div class="panel"><h3>Período — '+faseNome+'</h3><table class="tbl"><thead><tr><th>Início</th><th>Fim (prazo)</th><th>Turnos/dia</th><th>Dias úteis/semana</th><th>Defasagem (dias)</th></tr></thead><tbody><tr><td>'+inp(fase,'ini',cfg.ini,'date')+'</td><td>'+inp(fase,'fim',cfg.fim,'date')+'</td><td>'+inp('turnos','turnos',P.turnos)+'</td><td>'+inp('sem','sem',P.sem)+'</td><td>'+inp('lag','lag',P.lag)+'</td></tr></tbody></table></div>';
+  var dU=diasUteis(cfg.ini,cfg.fim,P.sem);
+  var pdTot=isC?e.pdJC:e.pdJ;var pdS=isC?e.pdJCs:e.pdJs;var nJ=isC?e.JC:e.J;
+  var reqPD=dU?Math.ceil(pdTot/dU):0;
   var roles=[['cald','Caldeireiro',isC?'pré-montagem / acoplamento':'corte / acoplamento'],['sold','Soldador','solda'],['insp','Inspetor','inspeção']];
-  var caps=roles.map(function(r){var c=cfg[r[0]]||{n:0,prod:0};return {key:r[0],nome:r[1],etapa:r[2],n:c.n||0,prod:c.prod||0,cap:Math.round((c.n||0)*(c.prod||0)),nec:(c.prod?Math.ceil(req/c.prod):0)};});
+  var caps=roles.map(function(r){var c=cfg[r[0]]||{n:0,prod:0};var cap=Math.round((c.n||0)*(c.prod||0)*(P.turnos||1));return {key:r[0],nome:r[1],etapa:r[2],n:c.n||0,prod:c.prod||0,cap:cap,nec:(c.prod&&P.turnos)?Math.ceil(reqPD/(c.prod*P.turnos)):0};});
   var capMin=Math.min.apply(null,caps.map(function(c){return c.cap;}));var garg=caps.slice().sort(function(a,b){return a.cap-b.cap;})[0];
-  var ok=capMin>=req&&req>0;var diasComEquipe=capMin?Math.ceil(juntas/capMin):0;var fimProj=cfg.ini?addDias(cfg.ini,Math.ceil(diasComEquipe*(7/(P.sem||6)))):'';
-  var pct=juntas?Math.round(jsold/juntas*100):0;var pesoDia=dias?Math.round(e.peso/dias):0;var spDia=dias?(e.nsp/dias):0;var pdDia=dias?Math.round(pd/dias):0;
-  var status= req===0?'<span class="badge b-new">defina início e fim</span>': ok?'<span class="badge b-ok">capacidade OK · gargalo '+garg.nome+' (folga '+(capMin-req)+' j/dia)</span>':'<span class="badge b-late">gargalo: '+garg.nome+' — faltam '+(garg.nec-garg.n)+' · fim projetado '+fmtBR(fimProj)+'</span>';
-  var eqt='<table class="tbl"><thead><tr><th>Função</th><th>Etapa</th><th>Nº</th><th>Juntas/dia por prof.</th><th>Capacidade (j/dia)</th><th>Nec. p/ prazo</th></tr></thead><tbody>'+
-    caps.map(function(c){var falta=req>0&&c.nec>c.n;return '<tr><td class="tg">'+c.nome+'</td><td style="color:var(--muted)">'+c.etapa+'</td><td>'+inpEq(fase,c.key,'n',c.n)+'</td><td>'+inpEq(fase,c.key,'prod',c.prod)+'</td><td><b style="color:'+((req>0&&c.cap>=req)?'var(--ok)':(falta?'var(--red)':'var(--txt)'))+'">'+c.cap+'</b></td><td>'+c.nec+(falta?' <span class="badge b-late">+'+(c.nec-c.n)+'</span>':'')+'</td></tr>';}).join('')+'</tbody></table>';
-  var metat='<table class="tbl"><thead><tr><th>Meta no prazo</th><th>Por dia</th><th>Por semana</th></tr></thead><tbody>'+
-    '<tr><td class="tg">Juntas</td><td>'+req+'</td><td>'+(req*P.sem)+'</td></tr>'+
-    '<tr><td class="tg">Peso</td><td>'+pesoDia+' kg</td><td>'+(pesoDia*P.sem)+' kg</td></tr>'+
-    '<tr><td class="tg">Spools</td><td>'+spDia.toFixed(1)+'</td><td>'+(spDia*P.sem).toFixed(1)+'</td></tr>'+
-    '<tr><td class="tg">PD</td><td>'+pdDia+'</td><td>'+(pdDia*P.sem)+'</td></tr></tbody></table>';
+  var ok=capMin>=reqPD&&reqPD>0;
+  var pdCabe=Math.min(pdTot,Math.round(capMin*dU));var pctCabe=pdTot?Math.round(pdCabe/pdTot*100):0;
+  var diasNec=capMin?Math.ceil(pdTot/capMin):0;var fimProj=cfg.ini?addDias(cfg.ini,Math.ceil(diasNec*(7/(P.sem||6)))):'';
+  var pctConcl=pdTot?Math.round(pdS/pdTot*100):0;
+  var status= reqPD===0?'<span class="badge b-new">defina início e fim</span>': ok?'<span class="badge b-ok">capacidade OK · gargalo '+garg.nome+' (folga '+(capMin-reqPD)+' PD/dia)</span>':'<span class="badge b-late">gargalo: '+garg.nome+' — cabe '+pctCabe+'% no período · fim projetado '+fmtBR(fimProj)+'</span>';
+  var eqt='<table class="tbl"><thead><tr><th>Função</th><th>Etapa</th><th>Nº</th><th>PD/turno por prof.</th><th>Capacidade (PD/dia)</th><th>Nec. p/ prazo</th></tr></thead><tbody>'+
+    caps.map(function(c){var falta=reqPD>0&&c.nec>c.n;return '<tr><td class="tg">'+c.nome+'</td><td style="color:var(--muted)">'+c.etapa+'</td><td>'+inpEq(fase,c.key,'n',c.n)+'</td><td>'+inpEq(fase,c.key,'prod',c.prod)+'</td><td><b style="color:'+((reqPD>0&&c.cap>=reqPD)?'var(--ok)':(falta?'var(--red)':'var(--txt)'))+'">'+c.cap+'</b></td><td>'+c.nec+(falta?' <span class="badge b-late">+'+(c.nec-c.n)+'</span>':'')+'</td></tr>';}).join('')+'</tbody></table>';
   var bloco='<div class="panel"><h3>'+faseNome+' '+status+'</h3>'+
-    '<div class="kpis">'+kpi('or',juntas,'Juntas '+(isC?'JC':'J'))+kpi('bl',req,'Ritmo nec. (j/dia)')+kpi('',dias,'Dias úteis')+kpi('ok',pct+'%','Concluído')+'</div>'+
-    '<h3 style="margin:14px 0 6px;font-size:14px">Equipe e capacidade</h3>'+eqt+
-    '<h3 style="margin:14px 0 6px;font-size:14px">Meta no prazo</h3>'+metat+
-    '<h3 style="margin:16px 0 0">Distribuição semanal</h3>'+semanaTbl(weeks)+'</div>';
-  var resumo='<div class="kpis">'+kpi('',(e.peso/1000).toFixed(1)+' t','Peso total')+kpi('bl',e.J+e.JC,'Juntas total')+kpi('or',e.nsp,'Spools')+kpi('',e.pdJ+e.pdJC,'PD total')+'</div>';
-  var acoes='<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap">'+(ed?'<button class="btn ghost" onclick="distribuirDatas(\''+fase+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Distribuir datas no período</button>':'')+'<button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir programação</button></div>';
+    '<div class="kpis">'+kpi('or',nJ,'Juntas '+(isC?'JC':'J'))+kpi('',pdTot,'PD total')+kpi('bl',reqPD,'Ritmo nec. (PD/dia)')+kpi('',capMin,'Capac. (PD/dia)')+kpi(ok?'ok':'rd',pctCabe+'%','Cabe no período')+kpi('ok',pctConcl+'%','Concluído')+'</div>'+
+    '<h3 style="margin:14px 0 6px;font-size:14px">Equipe e capacidade (PD por turno)</h3>'+eqt+
+    '<div class="vsub" style="margin-top:8px">Métrica: <b>PD (polegada-diâmetro) por turno por profissional</b>. Ex.: 1 soldador = 4 juntas de 4" = 16 PD/turno. Capacidade/dia = nº × PD/turno × turnos. As datas distribuem só o que <b>cabe no período</b>.</div></div>';
+  var resumo='<div class="kpis">'+kpi('',(e.peso/1000).toFixed(1)+' t','Peso total')+kpi('or',e.J+e.JC,'Juntas total')+kpi('bl',e.nsp,'Spools')+kpi('',e.pdJ+e.pdJC,'PD total')+'</div>';
+  var acoes='<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap">'+(ed?'<button class="btn ghost" onclick="distribuirDatas(\''+fase+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Redistribuir datas</button>':'')+'<button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir programação</button></div>';
   return acoes+toggle+resumo+params+bloco+renderCrono(fase);
 }
 function setEtPrev(did,cod,which,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;var o=sp[which]||(sp[which]={});var r=o[et]||(o[et]={});r.prev=val;persist();}
 function cronoEtapas(d,sp,fase){
-  var ed=podeEditar();var which=fase==='campo'?'campo':'fab';var ets=which==='campo'?CAMPO_ET:FAB_ET;var rows='';
-  ets.forEach(function(et){var r=(sp[which]||{})[et]||{};var p=r.pct||0;var done=p>=100;var atras=r.prev&&!done&&r.prev<hoje();var stat=done?'<span class="badge b-ok">100%</span>':atras?'<span class="badge b-late">atrasada</span>':(p>0?'<span class="badge b-run">'+p+'%</span>':'<span class="badge b-new">'+p+'%</span>');var etx=et.replace(/'/g,"\\'");
-    rows+='<tr><td class="tg">'+et+'</td><td>'+(ed?'<input type="date" value="'+(r.prev||'')+'" onchange="setEtPrev(\''+d.id+'\',\''+sp.cod+'\',\''+which+'\',\''+etx+'\',this.value)" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:6px;padding:3px 6px;font-size:12px">':fmtBR(r.prev))+'</td><td>'+fmtBR(r.real)+'</td><td>'+stat+'</td></tr>';
-  });
-  return '<table class="tbl" style="font-size:12.5px"><thead><tr><th>Etapa</th><th>Prevista</th><th>Realizada</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  var jc=fase==='campo';
+  var js=(sp.juntas||[]).filter(function(j){return ((j.tipo||'J').toUpperCase()==='JC')===jc;});
+  if(!js.length)return '<div class="vsub">Sem juntas desta fase neste spool.</div>';
+  var th='';for(var i=0;i<6;i++)th+='<th style="font-size:9.5px;text-align:center">'+JSTHEAD[i]+'</th>';
+  var rows=js.map(function(j){
+    if(j.fora)return '<tr><td class="tg">J'+j.n+'</td><td colspan="6" style="color:var(--red);font-size:11px;text-align:center">fora do período (capacidade da equipe)</td></tr>';
+    var c='';for(var i=0;i<6;i++){var pv=(j.pv&&j.pv[i])||'';var done=j[JST[i]];c+='<td style="text-align:center;font-size:11px;'+(done?'color:'+JSTCOR[i]+';font-weight:700':'color:var(--muted)')+'">'+(done?'✓ ':'')+(pv?fmtBR(pv):'—')+'</td>';}
+    return '<tr><td class="tg">J'+j.n+'</td>'+c+'</tr>';
+  }).join('');
+  return '<table class="tbl" style="font-size:11.5px"><thead><tr><th>Junta</th>'+th+'</tr></thead><tbody>'+rows+'</tbody></table>';
 }
 function cronoToggle(did,cod){window._cronoOpen=window._cronoOpen||{};var k=did+'|'+cod;var el=document.getElementById('crono_'+k);if(el){var show=el.style.display==='none';el.style.display=show?'block':'none';window._cronoOpen[k]=show;}}
 function renderCrono(fase){fase=fase||'fab';
@@ -752,7 +788,7 @@ function renderCrono(fase){fase=fase||'fab';
       '<span style="margin-left:auto;font-family:var(--disp);font-weight:700">'+spoolPct(sp)+'%</span>'+
       '</div><div id="crono_'+k+'" style="display:'+(open?'block':'none')+';margin-top:9px">'+cronoEtapas(d,sp,fase)+'</div></div>';
   }).join('')||'<div class="empty">Sem spools.</div>';
-  return '<div class="panel"><h3>Cronograma detalhado — '+(fase==='campo'?'Montagem':'Fabricação')+' <span style="font-size:12px;color:var(--muted);font-family:var(--body)">linha · juntas · peso · etapas com data prevista (clique no spool)</span></h3>'+
+  return '<div class="panel"><h3>Cronograma por junta — '+(fase==='campo'?'Montagem':'Fabricação')+' <span style="font-size:12px;color:var(--muted);font-family:var(--body)">datas previstas por junta, distribuídas no período conforme a equipe (clique no spool)</span></h3>'+
     '<div style="margin-bottom:10px">Isométrico / linha: <select onchange="window._cronoDes=this.value;go(\'prog\')" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 9px;max-width:100%">'+opts+'</select></div>'+sps+'</div>';
 }
 /* ============== EQUIPE ============== */
