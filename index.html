@@ -367,11 +367,11 @@ var _aplicandoRemoto=false,_syncCache={},_received={};
 function pushCloud(){
   if(_aplicandoRemoto||!window.CloudSync)return;
   (DB.desenhos||[]).forEach(function(d){var j=JSON.stringify(d);if(_syncCache['d_'+d.id]!==j){_syncCache['d_'+d.id]=j;window.CloudSync.pushDesenho(d.id,d);}});
-  var m={meta:DB.meta,prog:DB.prog,equipe:DB.equipe};var mj=JSON.stringify(m);if(_syncCache['__meta']!==mj){_syncCache['__meta']=mj;window.CloudSync.pushMeta(m);}
+  var m={meta:DB.meta,prog:DB.prog,equipe:DB.equipe,efetivo:DB.efetivo,equipamentos:DB.equipamentos,prodcfg:DB.prodcfg};var mj=JSON.stringify(m);if(_syncCache['__meta']!==mj){_syncCache['__meta']=mj;window.CloudSync.pushMeta(m);}
 }
 function _rerenderCloud(){try{syncTudo();}catch(e){}if(document.getElementById('app').classList.contains('on')){try{go(VIEW);}catch(e){}}if(document.getElementById('modal').classList.contains('on')&&CUR&&CUR.cod){try{abrirSpool(CUR.did,CUR.cod,CUR.fase);}catch(e){}}}
 window.__aplicarDesenho=function(id,obj){if(!obj)return;_aplicandoRemoto=true;_received[id]=1;var i=-1;for(var k=0;k<DB.desenhos.length;k++){if(DB.desenhos[k].id===id){i=k;break;}}if(i>=0)DB.desenhos[i]=obj;else DB.desenhos.push(obj);_syncCache['d_'+id]=JSON.stringify(obj);try{localStorage.setItem(LS.track,JSON.stringify(DB));}catch(e){}_aplicandoRemoto=false;_rerenderCloud();};
-window.__aplicarMeta=function(m){if(!m)return;_aplicandoRemoto=true;_received['__meta']=1;if(m.meta)DB.meta=m.meta;if(m.prog)DB.prog=m.prog;if(m.equipe)DB.equipe=m.equipe;_syncCache['__meta']=JSON.stringify({meta:DB.meta,prog:DB.prog,equipe:DB.equipe});try{localStorage.setItem(LS.track,JSON.stringify(DB));}catch(e){}_aplicandoRemoto=false;_rerenderCloud();};
+window.__aplicarMeta=function(m){if(!m)return;_aplicandoRemoto=true;_received['__meta']=1;if(m.meta)DB.meta=m.meta;if(m.prog)DB.prog=m.prog;if(m.equipe)DB.equipe=m.equipe;if(m.efetivo)DB.efetivo=m.efetivo;if(m.equipamentos)DB.equipamentos=m.equipamentos;if(m.prodcfg)DB.prodcfg=m.prodcfg;_syncCache['__meta']=JSON.stringify({meta:DB.meta,prog:DB.prog,equipe:DB.equipe,efetivo:DB.efetivo,equipamentos:DB.equipamentos,prodcfg:DB.prodcfg});try{localStorage.setItem(LS.track,JSON.stringify(DB));}catch(e){}_aplicandoRemoto=false;_rerenderCloud();};
 window.__semear=function(){if(!window.CloudSync)return;(DB.desenhos||[]).forEach(function(d){if(!_received[d.id]){_syncCache['d_'+d.id]=JSON.stringify(d);window.CloudSync.pushDesenho(d.id,d);}});if(!_received['__meta']){var m={meta:DB.meta,prog:DB.prog,equipe:DB.equipe};_syncCache['__meta']=JSON.stringify(m);window.CloudSync.pushMeta(m);}};
 function load(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
@@ -795,11 +795,30 @@ function renderRelatorios(){
 }
 
 /* ============== PRODUTIVIDADE ============== */
+function prodMetrics(){
+  var m={atvFab:0,atvCampo:0,pdSoldFab:0,pdSoldCampo:0,pesoFab:0,pesoMont:0,pdExecFab:0,pdExecCampo:0,porDes:{},porSpool:[]};
+  allSpools().forEach(function(x){var sp=x.sp,d=x.d;var w=pesoSpool(sp);var pesoF=w*fasePct(sp,'fab')/100,pesoM=w*fasePct(sp,'campo')/100;
+    var aF=0,aC=0,sF=0,sC=0,eF=0,eC=0;
+    (sp.juntas||[]).forEach(function(j){var jc=(j.tipo||'J').toUpperCase()==='JC';var done=0;for(var i=0;i<6;i++)if(j[JST[i]])done++;
+      if(jc){aC+=done;eC+=(j.dn||0)*done/6;if(j[JST[SOLDA_IDX]])sC+=j.dn||0;}else{aF+=done;eF+=(j.dn||0)*done/6;if(j[JST[SOLDA_IDX]])sF+=j.dn||0;}});
+    m.atvFab+=aF;m.atvCampo+=aC;m.pdSoldFab+=sF;m.pdSoldCampo+=sC;m.pesoFab+=pesoF;m.pesoMont+=pesoM;m.pdExecFab+=eF;m.pdExecCampo+=eC;
+    var pe=m.porDes[d.id]||(m.porDes[d.id]={cod:d.cod,desc:d.desc,atv:0,sold:0,peso:0,exec:0});
+    pe.atv+=aF+aC;pe.sold+=sF+sC;pe.peso+=pesoF+pesoM;pe.exec+=eF+eC;
+    m.porSpool.push({cod:sp.cod,des:d.cod,atv:aF+aC,sold:Math.round(sF+sC),peso:Math.round(pesoF+pesoM),exec:eF+eC});
+  });
+  return m;
+}
 function renderProdutividade(){
-  var pdTot=0,pdFeita=0;allSpools().forEach(function(x){pdTot+=pd(x.sp);pdFeita+=pdSold(x.sp);});
-  var rows=allSpools().map(function(x){var P=pd(x.sp),f=pdSold(x.sp),pc=P?Math.round(f/P*100):0;return '<tr><td class="tg">'+x.sp.cod+'</td><td>'+x.d.cod+'</td><td>'+P+'</td><td>'+f+'</td><td>'+barCell(pc)+'</td></tr>';}).join('');
-  return '<div class="kpis">'+kpi('',Math.round(pdTot),'PD total (pol)')+kpi('ok',Math.round(pdFeita),'PD soldada')+kpi('am',(pdTot?Math.round(pdFeita/pdTot*100):0)+'%','% soldagem')+'</div>'+
-    '<div class="panel"><h3>Polegada-diâmetro por spool</h3><table class="tbl"><thead><tr><th>Spool</th><th>Desenho</th><th>PD total</th><th>PD soldada</th><th>Soldagem</th></tr></thead><tbody>'+rows+'</tbody></table><div class="vsub" style="margin-top:10px">PD = soma dos diâmetros das juntas. PD soldada conta as juntas marcadas como soldadas (planilha de juntas).</div></div>';
+  var P=progGet();var hhPD=prodCfg().hhPD;var ini=P.fab.ini||P.campo.ini||'';var dd=ini?Math.max(1,diasUteis(ini,hoje(),P.sem||6)):1;
+  var m=prodMetrics();var atv=m.atvFab+m.atvCampo;var sold=Math.round(m.pdSoldFab+m.pdSoldCampo);var pesoKg=m.pesoFab+m.pesoMont;var hh=Math.round((m.pdExecFab+m.pdExecCampo)*hhPD);var ed=podeEditar();
+  var kp='<div class="kpis">'+kpi('or',atv,'Atividades executadas')+kpi('bl',sold,'PD soldado (soldas/Ø)')+kpi('',(pesoKg/1000).toFixed(1)+' t','Fab.+Mont. (peso)')+kpi('am',hh,'HH executado')+'</div>';
+  var perKp='<div class="kpis">'+kpi('',(atv/dd).toFixed(1),'Atividades / dia')+kpi('',(sold/dd).toFixed(1),'PD soldado / dia')+kpi('',Math.round(pesoKg/dd)+' kg','Peso / dia')+kpi('',(hh/dd).toFixed(1),'HH / dia')+'</div>';
+  var desRows=Object.keys(m.porDes).map(function(id){var p=m.porDes[id];return '<tr><td class="tg">'+p.cod+'</td><td>'+p.desc+'</td><td>'+p.atv+'</td><td>'+Math.round(p.sold)+'</td><td>'+Math.round(p.peso)+'</td><td>'+Math.round(p.exec*hhPD)+'</td></tr>';}).join('');
+  var spRows=m.porSpool.map(function(s){return '<tr><td class="tg">'+s.cod+'</td><td>'+s.des+'</td><td>'+s.atv+'</td><td>'+s.sold+'</td><td>'+s.peso+'</td><td>'+Math.round(s.exec*hhPD)+'</td></tr>';}).join('');
+  var nota='<div class="vsub" style="margin-top:10px">Desde '+(ini?fmtBR(ini):'—')+' · '+dd+' dias úteis decorridos. <b>Atividades</b> = etapas concluídas por junta (corte/lanç · acopl · IV+lib · solda · VT/LP · US). <b>PD soldado</b> = Ø das juntas soldadas. <b>HH</b> ≈ PD executado × '+(ed?'<input type="number" step="0.1" min="0" value="'+hhPD+'" onchange="setHHPD(this.value)" style="width:64px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:6px;padding:3px 6px">':'<b>'+hhPD+'</b>')+' HH/PD.</div>';
+  return kp+perKp+
+    '<div class="panel"><h3>Produtividade por desenho</h3><table class="tbl"><thead><tr><th>Desenho</th><th>Linha</th><th>Atividades</th><th>PD soldado</th><th>Peso (kg)</th><th>HH</th></tr></thead><tbody>'+desRows+'</tbody></table></div>'+
+    '<div class="panel"><h3>Produtividade por spool</h3><div style="max-height:440px;overflow:auto"><table class="tbl"><thead><tr><th>Spool</th><th>Desenho</th><th>Atividades</th><th>PD soldado</th><th>Peso (kg)</th><th>HH</th></tr></thead><tbody>'+spRows+'</tbody></table></div>'+nota+'</div>';
 }
 
 /* ===== PROGRAMAÇÃO (capacidade × prazo) ===== */
@@ -925,13 +944,23 @@ function renderCrono(fase){fase=fase||'fab';
     '<div style="margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">Isométrico / linha: <select onchange="window._cronoDes=this.value;go(\'prog\')" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 9px;max-width:100%">'+opts+'</select><span style="font-size:12px;color:var(--muted)"><b style="color:var(--ok)">'+(d.spools||[]).filter(function(sp){return spoolProgramado(sp,fase);}).length+'</b> programados · <b style="color:var(--red)">'+(d.spools||[]).filter(function(sp){return spJuntasTipo(sp,fase==='campo').length>0&&!spoolProgramado(sp,fase);}).length+'</b> fora do período (nesta linha)</span></div>'+sps+'</div>';
 }
 /* ============== EQUIPE ============== */
+var EFET_FUNC=[['cald','Caldeireiro'],['sold','Soldador'],['ajud','Ajudante'],['insp_dim','Inspetor de equipamentos / Dimensional'],['insp_lp','Inspetor de LP'],['insp_solda','Inspetor de Solda N1'],['insp_us','Inspetor de Ultrassom']];
+var EQUIP_LIST=[['maq_solda','Máquina de Solda'],['munck','Caminhão Munck'],['guindaste','Guindaste'],['gerador','Gerador'],['compressor','Compressor'],['plasma','Máquina de Plasma']];
+function efetGet(){if(!DB.efetivo)DB.efetivo={};return DB.efetivo;}
+function equipGet(){if(!DB.equipamentos)DB.equipamentos={};return DB.equipamentos;}
+function prodCfg(){if(!DB.prodcfg)DB.prodcfg={};if(DB.prodcfg.hhPD==null)DB.prodcfg.hhPD=1.5;return DB.prodcfg;}
+function setEfet(k,v){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}efetGet()[k]=parseInt(v)||0;persist();go('equipe');}
+function setEquip(k,v){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}equipGet()[k]=parseInt(v)||0;persist();go('equipe');}
+function setHHPD(v){if(!podeEditar())return;prodCfg().hhPD=parseFloat(v)||0;persist();go('equipe');}
 function renderEquipe(){
-  var add=podeEditar()?'<button class="btn" onclick="novoMembro()" style="margin-bottom:14px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Adicionar</button>':'';
-  var rows=DB.equipe.map(function(m,i){return '<tr><td class="tg">'+m.nome+'</td><td>'+m.func+'</td><td>'+m.mat+'</td>'+(podeEditar()?'<td><button class="btn ghost" style="padding:5px 9px" onclick="delMembro('+i+')">Remover</button></td>':'')+'</tr>';}).join('')||'<tr><td colspan="4" class="empty">Sem efetivo.</td></tr>';
-  return add+'<div class="panel"><h3>Efetivo da obra ('+DB.equipe.length+')</h3><table class="tbl"><thead><tr><th>Nome</th><th>Função</th><th>Matrícula</th>'+(podeEditar()?'<th></th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table></div>';
+  var ed=podeEditar();var ef=efetGet();var eq=equipGet();
+  var inpN=function(set,k,val){return ed?'<input type="number" min="0" value="'+(val||0)+'" onchange="'+set+'(\''+k+'\',this.value)" style="width:90px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 8px;font-size:14px">':'<b>'+(val||0)+'</b>';};
+  var totEf=EFET_FUNC.reduce(function(a,f){return a+(ef[f[0]]||0);},0);
+  var efRows=EFET_FUNC.map(function(f){return '<tr><td class="tg">'+f[1]+'</td><td>'+inpN('setEfet',f[0],ef[f[0]])+'</td></tr>';}).join('');
+  var eqRows=EQUIP_LIST.map(function(f){return '<tr><td class="tg">'+f[1]+'</td><td>'+inpN('setEquip',f[0],eq[f[0]])+'</td></tr>';}).join('');
+  return '<div class="panel"><h3>Efetivo disponível <span style="font-size:12px;color:var(--muted);font-family:var(--body)">total '+totEf+' pessoas</span></h3><table class="tbl"><thead><tr><th>Função</th><th>Quantidade</th></tr></thead><tbody>'+efRows+'</tbody></table></div>'+
+    '<div class="panel"><h3>Equipamentos</h3><table class="tbl"><thead><tr><th>Equipamento</th><th>Quantidade</th></tr></thead><tbody>'+eqRows+'</tbody></table></div>';
 }
-function novoMembro(){if(!podeEditar())return;var n=prompt('Nome:');if(!n)return;var f=prompt('Função:','Soldador')||'';var m=prompt('Matrícula:','')||'';DB.equipe.push({nome:n,func:f,mat:m});persist();go('equipe');}
-function delMembro(i){if(!podeEditar())return;if(!confirm('Remover '+DB.equipe[i].nome+'?'))return;DB.equipe.splice(i,1);persist();go('equipe');}
 
 /* ============== MODAL / EXPORT ============== */
 function fechar(){document.getElementById('modal').classList.remove('on');}
