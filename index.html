@@ -884,6 +884,27 @@ function distribuirDatas(fase,auto){
   });});});
   persist();if(!auto){go('prog');toast('Datas distribuídas por junta (dentro da capacidade) ✓');}
 }
+function progMetricsPeriodo(fase,de,ate){
+  var jc=fase==='campo';function inR(d){if(!d)return false;return (!de||d>=de)&&(!ate||d<=ate);}
+  var pv={atv:0,pd:0},rl={atv:0,pd:0};
+  allSpools().forEach(function(x){(x.sp.juntas||[]).forEach(function(j){if(((j.tipo||'J').toUpperCase()==='JC')!==jc)return;
+    for(var i=0;i<6;i++){
+      if(j.pv&&inR(j.pv[i])){pv.atv++;if(i===SOLDA_IDX)pv.pd+=j.dn||0;}
+      if(j[JST[i]]&&j.sd&&inR(j.sd[i])){rl.atv++;if(i===SOLDA_IDX)rl.pd+=j.dn||0;}
+    }});});
+  return {pv:pv,rl:rl};
+}
+function setProgFiltro(k,v){window[k==='de'?'_progDe':'_progAte']=v;go('prog');}
+function setProgQuick(t){var h=hoje();if(t==='tudo'){window._progDe='';window._progAte='';}else if(t==='hoje'){window._progDe=h;window._progAte=h;}else if(t==='7'){window._progDe=addDias(h,-6);window._progAte=h;}else if(t==='mes'){window._progDe=h.substring(0,8)+'01';window._progAte=h;}go('prog');}
+function progPeriodoPanel(fase){
+  var de=window._progDe||'',ate=window._progAte||'';var flt=de||ate;
+  var inpD=function(k,val){return '<input type="date" value="'+val+'" onchange="setProgFiltro(\''+k+'\',this.value)" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 8px;font-size:13px">';};
+  var fbtn=function(lbl,t){return '<button class="btn ghost" style="padding:6px 10px" onclick="setProgQuick(\''+t+'\')">'+lbl+'</button>';};
+  var mt=progMetricsPeriodo(fase,de,ate);var ader=mt.pv.atv?Math.round(mt.rl.atv/mt.pv.atv*100):0;
+  var filtro='<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px;margin-bottom:12px">De '+inpD('de',de)+' Até '+inpD('ate',ate)+fbtn('Hoje','hoje')+fbtn('7 dias','7')+fbtn('Mês','mes')+fbtn('Tudo','tudo')+'<span style="color:var(--muted)">'+(flt?'período <b>'+(de?fmtBR(de):'…')+'</b> a <b>'+(ate?fmtBR(ate):'…')+'</b>':'tudo (acumulado)')+'</span></div>';
+  var kp='<div class="kpis">'+kpi('bl',mt.pv.atv,'Atividades previstas')+kpi('ok',mt.rl.atv,'Atividades realizadas')+kpi('',Math.round(mt.pv.pd),'PD previsto (solda)')+kpi('ok',Math.round(mt.rl.pd),'PD realizado (solda)')+kpi(ader>=100?'ok':'am',ader+'%','Aderência')+'</div>';
+  return '<div class="panel"><h3>Previsto × Realizado no período</h3>'+filtro+kp+'<div class="vsub" style="margin-top:8px">Previsto = etapas com data programada no período. Realizado = etapas concluídas no período. Aderência = realizado ÷ previsto.</div></div>';
+}
 function renderProgramacao(){
   var P=progGet();var e=escopoProg();var ed=podeEditar();
   var inp=function(grp,key,val,type){return '<input '+(ed?'':'disabled')+' type="'+(type||'number')+'" value="'+(val||'')+'" onchange="setProg(\''+grp+'\',\''+key+'\',this.value)" style="width:100%;max-width:160px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 8px;font-size:13px">';};
@@ -914,7 +935,7 @@ function renderProgramacao(){
     '<div class="vsub" style="margin-top:8px">Programado conforme o <b>efetivo disponível</b>. Capac. efetiva por função = nº × PD/turno × turnos ÷ etapas que a função executa por junta (recurso por atividade: ex. soldador faz acoplamento + solda; na montagem o caldeireiro faz lançamento + acoplamento com 2 pessoas). O <b>gargalo</b> define o ritmo e a distribuição das datas. "Nec. p/ prazo" = efetivo que cada função precisaria para cumprir o período.</div><div class="vsub" style="margin-top:6px"><b>Índice (HH/m por diâmetro):</b> '+hhTot+' HH na '+(isC?'montagem':'fabricação')+' · efetivo '+efTot+' × '+(pc2.horasTurno||8)+'h × '+(P.turnos||1)+' turno = <b>'+hhDia+' HH/dia</b> → <b>'+diasHH+' dias úteis</b>'+(fimHH?' (fim projetado '+fmtBR(fimHH)+')':'')+'.</div></div>';
   var resumo='<div class="kpis">'+kpi('',(e.peso/1000).toFixed(1)+' t','Peso total')+kpi('or',e.J+e.JC,'Juntas total')+kpi('bl',e.nsp,'Spools')+kpi('',e.pdJ+e.pdJC,'PD total')+'</div>';
   var acoes='<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap">'+(ed?'<button class="btn ghost" onclick="distribuirDatas(\''+fase+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Redistribuir datas</button>':'')+'<button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir programação</button></div>';
-  return acoes+toggle+resumo+params+bloco+renderCrono(fase);
+  return acoes+toggle+resumo+params+bloco+progPeriodoPanel(fase)+renderCrono(fase);
 }
 function setEtPrev(did,cod,which,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;var o=sp[which]||(sp[which]={});var r=o[et]||(o[et]={});r.prev=val;persist();}
 function cronoEtapas(d,sp,fase){
