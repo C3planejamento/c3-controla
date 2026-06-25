@@ -347,6 +347,7 @@ var JST=['s0','s1','s2','s3','s4','s5'];                                  /* est
 var JSTCOR=['#9aa3b8','#e8730c','#e0a32e','#1f9d4d','#2563eb','#7c4dff']; /* corte/lanç, acopl, IV+lib, solda, VT/LP, US */
 var JSTHEAD=['Corte/Lanç.','Acopl.','IV+Lib','Solda','VT/LP','US'];
 var SOLDA_IDX=3;
+var APPVER='v27';
 /* Recurso por atividade: nº de etapas (peso de efetivo) que cada função executa por junta — só p/ cálculo de capacidade */
 var REC_MULT={fab:{cald:2,sold:2,insp_solda:2,insp_lp:2,insp_us:1},campo:{cald:4,sold:2,insp_solda:2,insp_lp:2,insp_us:1}};
 
@@ -404,7 +405,7 @@ function entrar(){
 function abrirApp(){
   document.getElementById('login').classList.add('off');
   document.getElementById('app').classList.add('on');
-  document.getElementById('uchip').innerHTML='<b>Modo edição</b>';
+  document.getElementById('uchip').innerHTML='<b>Modo edição</b> <span style="font-size:10px;opacity:.6">'+APPVER+'</span>';
   buildNav();go(VIEW);
 }
 function sair(){SESS={role:null,user:null};try{sessionStorage.removeItem(LS.sess);}catch(e){}document.getElementById('app').classList.remove('on');document.getElementById('login').classList.remove('off');}
