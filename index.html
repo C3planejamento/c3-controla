@@ -940,14 +940,13 @@ function renderProgramacao(){
 function setEtPrev(did,cod,which,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;var o=sp[which]||(sp[which]={});var r=o[et]||(o[et]={});r.prev=val;persist();}
 function cronoEtapas(d,sp,fase){
   var jc=fase==='campo';
-  var de=window._progDe||'',ate=window._progAte||'';var flt=de||ate;
-  function inR(dt){if(!flt)return true;if(!dt)return false;return (!de||dt>=de)&&(!ate||dt<=ate);}
+  var lim=window._progAte||window._progDe||'';   /* zera apenas datas posteriores ao fim do filtro */
   var js=(sp.juntas||[]).filter(function(j){return ((j.tipo||'J').toUpperCase()==='JC')===jc;});
   if(!js.length)return '<div class="vsub">Sem juntas desta fase neste spool.</div>';
   var th='';for(var i=0;i<6;i++)th+='<th style="font-size:9.5px;text-align:center">'+JSTHEAD[i]+'</th>';
   var rows=js.map(function(j){
     if(j.fora)return '<tr><td class="tg">J'+j.n+'</td><td colspan="6" style="color:var(--red);font-size:11px;text-align:center">fora do período (capacidade da equipe)</td></tr>';
-    var c='';for(var i=0;i<6;i++){var pv=(j.pv&&j.pv[i])||'';if(flt&&!inR(pv))pv='';var done=j[JST[i]];c+='<td style="text-align:center;font-size:11px;'+(done?'color:'+JSTCOR[i]+';font-weight:700':'color:var(--muted)')+'">'+(done?'✓ ':'')+(pv?fmtBR(pv):'—')+'</td>';}
+    var c='';for(var i=0;i<6;i++){var pv=(j.pv&&j.pv[i])||'';if(lim&&pv&&pv>lim)pv='';var done=j[JST[i]];c+='<td style="text-align:center;font-size:11px;'+(done?'color:'+JSTCOR[i]+';font-weight:700':'color:var(--muted)')+'">'+(done?'✓ ':'')+(pv?fmtBR(pv):'—')+'</td>';}
     return '<tr><td class="tg">J'+j.n+'</td>'+c+'</tr>';
   }).join('');
   return '<table class="tbl" style="font-size:11.5px"><thead><tr><th>Junta</th>'+th+'</tr></thead><tbody>'+rows+'</tbody></table>';
