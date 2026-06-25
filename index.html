@@ -802,23 +802,23 @@ function prodMetrics(){
     (sp.juntas||[]).forEach(function(j){var jc=(j.tipo||'J').toUpperCase()==='JC';var done=0;for(var i=0;i<6;i++)if(j[JST[i]])done++;
       if(jc){aC+=done;eC+=(j.dn||0)*done/6;if(j[JST[SOLDA_IDX]])sC+=j.dn||0;}else{aF+=done;eF+=(j.dn||0)*done/6;if(j[JST[SOLDA_IDX]])sF+=j.dn||0;}});
     m.atvFab+=aF;m.atvCampo+=aC;m.pdSoldFab+=sF;m.pdSoldCampo+=sC;m.pesoFab+=pesoF;m.pesoMont+=pesoM;m.pdExecFab+=eF;m.pdExecCampo+=eC;
-    var pe=m.porDes[d.id]||(m.porDes[d.id]={cod:d.cod,desc:d.desc,atv:0,sold:0,peso:0,exec:0});
-    pe.atv+=aF+aC;pe.sold+=sF+sC;pe.peso+=pesoF+pesoM;pe.exec+=eF+eC;
-    m.porSpool.push({cod:sp.cod,des:d.cod,atv:aF+aC,sold:Math.round(sF+sC),peso:Math.round(pesoF+pesoM),exec:eF+eC});
+    var pe=m.porDes[d.id]||(m.porDes[d.id]={cod:d.cod,desc:d.desc,atv:0,sold:0,pesoF:0,pesoM:0,exec:0});
+    pe.atv+=aF+aC;pe.sold+=sF+sC;pe.pesoF+=pesoF;pe.pesoM+=pesoM;pe.exec+=eF+eC;
+    m.porSpool.push({cod:sp.cod,des:d.cod,atv:aF+aC,sold:Math.round(sF+sC),pesoF:Math.round(pesoF),pesoM:Math.round(pesoM),exec:eF+eC});
   });
   return m;
 }
 function renderProdutividade(){
   var P=progGet();var hhPD=prodCfg().hhPD;var ini=P.fab.ini||P.campo.ini||'';var dd=ini?Math.max(1,diasUteis(ini,hoje(),P.sem||6)):1;
   var m=prodMetrics();var atv=m.atvFab+m.atvCampo;var sold=Math.round(m.pdSoldFab+m.pdSoldCampo);var pesoKg=m.pesoFab+m.pesoMont;var hh=Math.round((m.pdExecFab+m.pdExecCampo)*hhPD);var ed=podeEditar();
-  var kp='<div class="kpis">'+kpi('or',atv,'Atividades executadas')+kpi('bl',sold,'PD soldado (soldas/Ø)')+kpi('',(pesoKg/1000).toFixed(1)+' t','Fab.+Mont. (peso)')+kpi('am',hh,'HH executado')+'</div>';
+  var kp='<div class="kpis">'+kpi('or',atv,'Atividades executadas')+kpi('bl',sold,'PD soldado (soldas/Ø)')+kpi('',(m.pesoFab/1000).toFixed(1)+' t','Peso fabricado')+kpi('',(m.pesoMont/1000).toFixed(1)+' t','Peso montado')+kpi('am',hh,'HH executado')+'</div>';
   var perKp='<div class="kpis">'+kpi('',(atv/dd).toFixed(1),'Atividades / dia')+kpi('',(sold/dd).toFixed(1),'PD soldado / dia')+kpi('',Math.round(pesoKg/dd)+' kg','Peso / dia')+kpi('',(hh/dd).toFixed(1),'HH / dia')+'</div>';
-  var desRows=Object.keys(m.porDes).map(function(id){var p=m.porDes[id];return '<tr><td class="tg">'+p.cod+'</td><td>'+p.desc+'</td><td>'+p.atv+'</td><td>'+Math.round(p.sold)+'</td><td>'+Math.round(p.peso)+'</td><td>'+Math.round(p.exec*hhPD)+'</td></tr>';}).join('');
-  var spRows=m.porSpool.map(function(s){return '<tr><td class="tg">'+s.cod+'</td><td>'+s.des+'</td><td>'+s.atv+'</td><td>'+s.sold+'</td><td>'+s.peso+'</td><td>'+Math.round(s.exec*hhPD)+'</td></tr>';}).join('');
+  var desRows=Object.keys(m.porDes).map(function(id){var p=m.porDes[id];return '<tr><td class="tg">'+p.cod+'</td><td>'+p.desc+'</td><td>'+p.atv+'</td><td>'+Math.round(p.sold)+'</td><td>'+Math.round(p.pesoF)+'</td><td>'+Math.round(p.pesoM)+'</td><td>'+Math.round(p.exec*hhPD)+'</td></tr>';}).join('');
+  var spRows=m.porSpool.map(function(s){return '<tr><td class="tg">'+s.cod+'</td><td>'+s.des+'</td><td>'+s.atv+'</td><td>'+s.sold+'</td><td>'+s.pesoF+'</td><td>'+s.pesoM+'</td><td>'+Math.round(s.exec*hhPD)+'</td></tr>';}).join('');
   var nota='<div class="vsub" style="margin-top:10px">Desde '+(ini?fmtBR(ini):'—')+' · '+dd+' dias úteis decorridos. <b>Atividades</b> = etapas concluídas por junta (corte/lanç · acopl · IV+lib · solda · VT/LP · US). <b>PD soldado</b> = Ø das juntas soldadas. <b>HH</b> ≈ PD executado × '+(ed?'<input type="number" step="0.1" min="0" value="'+hhPD+'" onchange="setHHPD(this.value)" style="width:64px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:6px;padding:3px 6px">':'<b>'+hhPD+'</b>')+' HH/PD.</div>';
   return kp+perKp+
-    '<div class="panel"><h3>Produtividade por desenho</h3><table class="tbl"><thead><tr><th>Desenho</th><th>Linha</th><th>Atividades</th><th>PD soldado</th><th>Peso (kg)</th><th>HH</th></tr></thead><tbody>'+desRows+'</tbody></table></div>'+
-    '<div class="panel"><h3>Produtividade por spool</h3><div style="max-height:440px;overflow:auto"><table class="tbl"><thead><tr><th>Spool</th><th>Desenho</th><th>Atividades</th><th>PD soldado</th><th>Peso (kg)</th><th>HH</th></tr></thead><tbody>'+spRows+'</tbody></table></div>'+nota+'</div>';
+    '<div class="panel"><h3>Produtividade por desenho</h3><table class="tbl"><thead><tr><th>Desenho</th><th>Linha</th><th>Atividades</th><th>PD soldado</th><th>Peso Fab. (kg)</th><th>Peso Mont. (kg)</th><th>HH</th></tr></thead><tbody>'+desRows+'</tbody></table></div>'+
+    '<div class="panel"><h3>Produtividade por spool</h3><div style="max-height:440px;overflow:auto"><table class="tbl"><thead><tr><th>Spool</th><th>Desenho</th><th>Atividades</th><th>PD soldado</th><th>Peso Fab. (kg)</th><th>Peso Mont. (kg)</th><th>HH</th></tr></thead><tbody>'+spRows+'</tbody></table></div>'+nota+'</div>';
 }
 
 /* ===== PROGRAMAÇÃO (capacidade × prazo) ===== */
