@@ -895,7 +895,12 @@ function progMetricsPeriodo(fase,de,ate){
   return {pv:pv,rl:rl};
 }
 function setProgFiltro(k,v){window[k==='de'?'_progDe':'_progAte']=v;go('prog');}
-function setProgQuick(t){var h=hoje();if(t==='tudo'){window._progDe='';window._progAte='';}else if(t==='hoje'){window._progDe=h;window._progAte=h;}else if(t==='7'){window._progDe=addDias(h,-6);window._progAte=h;}else if(t==='mes'){window._progDe=h.substring(0,8)+'01';window._progAte=h;}go('prog');}
+function setProgQuick(t){var h=hoje();var d0=new Date(h+'T00:00:00');
+  if(t==='tudo'){window._progDe='';window._progAte='';}
+  else if(t==='hoje'){window._progDe=h;window._progAte=h;}
+  else if(t==='7'){window._progDe=h;window._progAte=addDias(h,6);}
+  else if(t==='mes'){var me=new Date(d0.getFullYear(),d0.getMonth()+1,0);window._progDe=h.substring(0,8)+'01';window._progAte=me.getFullYear()+'-'+_pad2(me.getMonth()+1)+'-'+_pad2(me.getDate());}
+  go('prog');}
 function progPeriodoPanel(fase){
   var de=window._progDe||'',ate=window._progAte||'';var flt=de||ate;
   var inpD=function(k,val){return '<input type="date" value="'+val+'" onchange="setProgFiltro(\''+k+'\',this.value)" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 8px;font-size:13px">';};
@@ -940,19 +945,20 @@ function renderProgramacao(){
 function setEtPrev(did,cod,which,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;var o=sp[which]||(sp[which]={});var r=o[et]||(o[et]={});r.prev=val;persist();}
 function cronoEtapas(d,sp,fase){
   var jc=fase==='campo';
-  var lim=window._progAte||window._progDe||'';   /* zera apenas datas posteriores ao fim do filtro */
+  var de=window._progDe||'',ate=window._progAte||'';var flt=de||ate;function _in(dt){return (!de||dt>=de)&&(!ate||dt<=ate);}   /* janela do período */
   var js=(sp.juntas||[]).filter(function(j){return ((j.tipo||'J').toUpperCase()==='JC')===jc;});
   if(!js.length)return '<div class="vsub">Sem juntas desta fase neste spool.</div>';
   var th='';for(var i=0;i<6;i++)th+='<th style="font-size:9.5px;text-align:center">'+JSTHEAD[i]+'</th>';
   var rows=js.map(function(j){
     if(j.fora)return '<tr><td class="tg">J'+j.n+'</td><td colspan="6" style="color:var(--red);font-size:11px;text-align:center">fora do período (capacidade da equipe)</td></tr>';
-    var c='';for(var i=0;i<6;i++){var pv=(j.pv&&j.pv[i])||'';if(lim&&pv&&pv>lim)pv='';var done=j[JST[i]];c+='<td style="text-align:center;font-size:11px;'+(done?'color:'+JSTCOR[i]+';font-weight:700':'color:var(--muted)')+'">'+(done?'✓ ':'')+(pv?fmtBR(pv):'—')+'</td>';}
+    var c='';for(var i=0;i<6;i++){var pv=(j.pv&&j.pv[i])||'';if(flt&&pv&&!_in(pv))pv='';var done=j[JST[i]];c+='<td style="text-align:center;font-size:11px;'+(done?'color:'+JSTCOR[i]+';font-weight:700':'color:var(--muted)')+'">'+(done?'✓ ':'')+(pv?fmtBR(pv):'—')+'</td>';}
     return '<tr><td class="tg">J'+j.n+'</td>'+c+'</tr>';
   }).join('');
   return '<table class="tbl" style="font-size:11.5px"><thead><tr><th>Junta</th>'+th+'</tr></thead><tbody>'+rows+'</tbody></table>';
 }
 function cronoToggle(did,cod){window._cronoOpen=window._cronoOpen||{};var k=did+'|'+cod;var el=document.getElementById('crono_'+k);if(el){var show=el.style.display==='none';el.style.display=show?'block':'none';window._cronoOpen[k]=show;}}
 function spoolProgramado(sp,fase){var jc=fase==='campo';return (sp.juntas||[]).some(function(j){return ((j.tipo||'J').toUpperCase()==='JC')===jc && !j.fora && j.pv && Object.keys(j.pv).length>0;});}
+function spoolNoPeriodo(sp,fase,de,ate){var jc=fase==='campo';return (sp.juntas||[]).some(function(j){if(((j.tipo||'J').toUpperCase()==='JC')!==jc||!j.pv)return false;for(var i=0;i<6;i++){var dt=j.pv[i];if(dt&&(!de||dt>=de)&&(!ate||dt<=ate))return true;}return false;});}
 function renderForaList(fase){
   var jc=fase==='campo';var rows=[];var pdFora=0;
   DB.desenhos.forEach(function(d){(d.spools||[]).forEach(function(sp){var js=spJuntasTipo(sp,jc);if(!js.length)return;if(spoolProgramado(sp,fase))return;var pdf=Math.round(js.reduce(function(a,j){return a+(j.dn||0);},0));pdFora+=pdf;rows.push('<tr class="clic" onclick="fechar();abrirSpool(\''+d.id+'\',\''+sp.cod+'\',\''+fase+'\')"><td class="tg">'+sp.cod+'</td><td>'+d.cod+'</td><td>'+d.desc+'</td><td>'+sp.dn+'"</td><td>'+js.length+'</td><td>'+pdf+'</td></tr>');});});
@@ -963,7 +969,7 @@ function renderCrono(fase){fase=fase||'fab';
   var des=window._cronoDes||(DB.desenhos[0]&&DB.desenhos[0].id);
   var d=DB.desenhos.find(function(x){return x.id===des;})||DB.desenhos[0];if(!d)return '';
   var opts=DB.desenhos.map(function(x){return '<option value="'+x.id+'"'+(x.id===d.id?' selected':'')+'>'+x.cod+' — '+x.desc+' ('+(x.spools||[]).length+' spools)</option>';}).join('');
-  var sps=(d.spools||[]).filter(function(sp){return spoolProgramado(sp,fase);}).map(function(sp){var nJ=spJuntasTipo(sp,false).length,nJC=spJuntasTipo(sp,true).length;var peso=Math.round(pesoSpool(sp));var k=d.id+'|'+sp.cod;var open=(window._cronoOpen&&window._cronoOpen[k]);
+  var sps=(d.spools||[]).filter(function(sp){var fde=window._progDe||'',fate=window._progAte||'';return spoolProgramado(sp,fase)&&(!(fde||fate)||spoolNoPeriodo(sp,fase,fde,fate));}).map(function(sp){var nJ=spJuntasTipo(sp,false).length,nJC=spJuntasTipo(sp,true).length;var peso=Math.round(pesoSpool(sp));var k=d.id+'|'+sp.cod;var open=(window._cronoOpen&&window._cronoOpen[k])||!!(window._progDe||window._progAte);
     return '<div class="crow"><div class="ch" onclick="cronoToggle(\''+d.id+'\',\''+sp.cod+'\')">'+
       '<span class="cc">'+sp.cod+'</span>'+
       '<span class="cm">'+d.desc+'</span>'+
@@ -973,7 +979,7 @@ function renderCrono(fase){fase=fase||'fab';
       '<span class="cm">PD '+pd(sp)+'</span>'+
       '<span style="margin-left:auto;font-family:var(--disp);font-weight:700">'+spoolPct(sp)+'%</span>'+
       '</div><div id="crono_'+k+'" style="display:'+(open?'block':'none')+';margin-top:9px">'+cronoEtapas(d,sp,fase)+'</div></div>';
-  }).join('')||'<div class="empty">Nenhum spool programado nesta linha no período (defina período e equipe).</div>';
+  }).join('')||'<div class="empty">Nenhum spool com atividade no período selecionado nesta linha (use "Tudo" para ver todos).</div>';
   return '<div class="panel"><h3>Cronograma por junta — '+(fase==='campo'?'Montagem':'Fabricação')+' <span style="font-size:12px;color:var(--muted);font-family:var(--body)">datas previstas por junta, distribuídas no período conforme a equipe (clique no spool)</span></h3>'+
     '<div style="margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">Isométrico / linha: <select onchange="window._cronoDes=this.value;go(\'prog\')" style="background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:6px 9px;max-width:100%">'+opts+'</select><span style="font-size:12px;color:var(--muted)"><b style="color:var(--ok)">'+(d.spools||[]).filter(function(sp){return spoolProgramado(sp,fase);}).length+'</b> programados · <b style="color:var(--red)">'+(d.spools||[]).filter(function(sp){return spJuntasTipo(sp,fase==='campo').length>0&&!spoolProgramado(sp,fase);}).length+'</b> fora do período (nesta linha)</span></div>'+sps+'</div>';
 }
