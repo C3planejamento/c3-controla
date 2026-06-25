@@ -873,7 +873,7 @@ function renderProgramacao(){
     '<div class="vsub" style="margin-top:8px">Métrica: <b>PD (polegada-diâmetro) por turno por profissional</b>. Ex.: 1 soldador = 4 juntas de 4" = 16 PD/turno. Capacidade/dia = nº × PD/turno × turnos. As datas distribuem só o que <b>cabe no período</b>.</div></div>';
   var resumo='<div class="kpis">'+kpi('',(e.peso/1000).toFixed(1)+' t','Peso total')+kpi('or',e.J+e.JC,'Juntas total')+kpi('bl',e.nsp,'Spools')+kpi('',e.pdJ+e.pdJC,'PD total')+'</div>';
   var acoes='<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap">'+(ed?'<button class="btn ghost" onclick="distribuirDatas(\''+fase+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Redistribuir datas</button>':'')+'<button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir programação</button></div>';
-  return acoes+toggle+resumo+params+bloco+renderForaList(fase)+renderCrono(fase);
+  return acoes+toggle+resumo+params+bloco+renderCrono(fase);
 }
 function setEtPrev(did,cod,which,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;var o=sp[which]||(sp[which]={});var r=o[et]||(o[et]={});r.prev=val;persist();}
 function cronoEtapas(d,sp,fase){
