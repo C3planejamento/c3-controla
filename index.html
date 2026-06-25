@@ -201,8 +201,8 @@ button,input,select,textarea{font-family:inherit}
 .dcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
 .dcard{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .14s,box-shadow .14s,border-color .14s}
 .dcard:hover{border-color:var(--acc);transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.14)}
-.dcimg{height:140px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);overflow:hidden}
-.dcimg img{width:100%;height:100%;object-fit:cover;object-position:center}
+.dcimg{height:150px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);overflow:hidden;padding:6px}
+.dcimg img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
 .dcimg.noimg::after{content:'sem miniatura';color:var(--muted);font-size:12px}
 .dcb{padding:11px 13px;display:flex;flex-direction:column;gap:7px}
 .dccod{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--txt);display:flex;align-items:center;justify-content:space-between;gap:8px}
