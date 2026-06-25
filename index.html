@@ -198,6 +198,22 @@ button,input,select,textarea{font-family:inherit}
 .tvtbl th{text-align:left;color:var(--muted);text-transform:uppercase;font-size:12px;letter-spacing:1px;padding:9px 14px;border-bottom:1px solid var(--line)}
 .tvtbl td{padding:10px 14px;border-bottom:1px solid var(--line);font-weight:600}
 .tvfoot{display:flex;justify-content:space-between;padding:12px 30px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.dcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.dcard{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .14s,box-shadow .14s,border-color .14s}
+.dcard:hover{border-color:var(--acc);transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,.14)}
+.dcimg{height:140px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line);overflow:hidden}
+.dcimg img{width:100%;height:100%;object-fit:cover;object-position:center}
+.dcimg.noimg::after{content:'sem miniatura';color:var(--muted);font-size:12px}
+.dcb{padding:11px 13px;display:flex;flex-direction:column;gap:7px}
+.dccod{font-family:var(--disp);font-weight:700;font-size:15px;color:var(--txt);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dcrev{font-family:var(--body);font-weight:600;font-size:10.5px;color:#fff;background:var(--orange);padding:2px 8px;border-radius:20px;white-space:nowrap}
+.dcdesc{font-size:12px;color:var(--muted);line-height:1.35;min-height:32px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dcstats{display:flex;justify-content:space-between;gap:6px;background:var(--inp);border:1px solid var(--inpline);border-radius:8px;padding:6px 8px;font-size:11px;color:var(--muted)}
+.dcstats b{font-family:var(--disp);font-size:14px;color:var(--txt);display:block;line-height:1.1}
+.dcstats span{text-align:center;flex:1}
+.dcrow{display:flex;align-items:center;gap:8px;font-size:12px}
+.dcrow>span{width:36px;color:var(--muted)}
+.dcrow .bar{flex:1}
 #printhead,#printDoc{display:none}
 @media print{
   .sb,.top,#tv,.modal,.toast,.filters,.btn,.maplegend,.imglegend{display:none!important}
@@ -450,14 +466,20 @@ function renderPainel(){
     kpi('or',nD,'Desenhos')+kpi('bl',nS,'Spools')+kpi('',sp.reduce(function(a,x){return a+((x.sp.juntas&&x.sp.juntas.length)||0);},0),'Juntas')+
     kpi('am',avFab+'%','Fabricação')+kpi('am',avCampo+'%','Montagem')+
     kpi('ok',conc,'Concluídos')+kpi('rd',revPend,'Rev. pendente')+'</div>';
-  /* avanço por desenho */
+  /* avanço por desenho — cards com miniatura do isométrico */
   var rows=DB.desenhos.map(function(d){
     var ss=d.spools||[];var pf=ss.length?Math.round(ss.reduce(function(a,s){return a+fasePct(s,'fab');},0)/ss.length):0;
     var pc=ss.length?Math.round(ss.reduce(function(a,s){return a+fasePct(s,'campo');},0)/ss.length):0;
-    return '<tr class="clic" onclick="abrirDesenho(\''+d.id+'\')"><td class="tg">'+d.cod+'</td><td>'+d.desc+'</td><td>Rev '+d.rev+'</td><td>'+ss.length+'</td>'+
-      '<td>'+barCell(pf)+'</td><td>'+barCell(pc)+'</td></tr>';
+    var nj=ss.reduce(function(a,s){return a+((s.juntas&&s.juntas.length)||0);},0);var pw=pesoDesenho(d);
+    return '<div class="dcard clic" onclick="abrirAvanco(\''+d.id+'\')">'+
+      '<div class="dcimg"><img src="desenhos/'+d.id+'.jpg" loading="lazy" onerror="this.parentNode.classList.add(\'noimg\');this.remove();"></div>'+
+      '<div class="dcb"><div class="dccod">'+d.cod+'<span class="dcrev">Rev '+d.rev+'</span></div>'+
+      '<div class="dcdesc">'+(d.desc||'')+'</div>'+
+      '<div class="dcstats"><span><b>'+ss.length+'</b> spools</span><span><b>'+nj+'</b> juntas</span><span><b>'+(pw?Math.round(pw).toLocaleString('pt-BR'):'—')+'</b> kg</span></div>'+
+      '<div class="dcrow"><span>Fab.</span>'+barCell(pf)+'</div>'+
+      '<div class="dcrow"><span>Mont.</span>'+barCell(pc)+'</div></div></div>';
   }).join('');
-  return stripHTML()+k+'<div class="panel"><h3>Avanço por desenho</h3><table class="tbl"><thead><tr><th>Código</th><th>Descrição</th><th>Rev.</th><th>Spools</th><th>Fabricação</th><th>Montagem</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  return stripHTML()+k+'<div class="panel"><h3>Avanço por desenho <span style="font-size:12px;color:var(--muted);font-family:var(--body)">'+DB.desenhos.length+' isométricos · clique no card para abrir</span></h3><div class="dcards">'+rows+'</div></div>';
 }
 function kpi(c,v,l){return '<div class="kpi '+c+'"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
 function barCell(p){return '<div style="display:flex;align-items:center;gap:8px"><div class="bar '+(p>=100?'full':'')+'"><i style="width:'+p+'%"></i></div><b style="font-family:var(--disp);font-size:12px">'+p+'%</b></div>';}
@@ -536,6 +558,7 @@ function pesoMaterial(m){
   if(/ESTOJO|PARAFUSO/.test(desc))return f('ESTOJO')*q;
   return 0;
 }
+function pesoDesenho(d){var bom=(typeof SEEDMAT!=='undefined'&&SEEDMAT[d.id])||d.materiais||[];if(bom.length)return bom.reduce(function(a,m){return a+pesoMaterial(m);},0);return (d.spools||[]).reduce(function(a,s){return a+(typeof pesoSpool==='function'?pesoSpool(s):0);},0);}
 function imprimirDesenhoMat(id){
   var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;
   var bom=(typeof SEEDMAT!=='undefined'&&SEEDMAT[id])||d.materiais||[];var pt=0;
@@ -647,6 +670,25 @@ function renderMapa(){
 }
 
 var CUR=null;
+function abrirAvanco(id){
+  var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;var ed=podeEditar();
+  document.getElementById('mTag').textContent='AVANÇO';
+  document.getElementById('mT').textContent=d.cod+' — '+d.desc;
+  document.getElementById('mS').textContent=d.area+' · Rev '+d.rev;
+  var ss=d.spools||[];
+  var pf=ss.length?Math.round(ss.reduce(function(a,s){return a+fasePct(s,'fab');},0)/ss.length):0;
+  var pc=ss.length?Math.round(ss.reduce(function(a,s){return a+fasePct(s,'campo');},0)/ss.length):0;
+  var nj=ss.reduce(function(a,s){return a+njuntas(s);},0);
+  var kp='<div class="kpis">'+kpi('bl',ss.length,'Spools')+kpi('or',nj,'Juntas')+kpi('am',pf+'%','Fabricação')+kpi('am',pc+'%','Montagem')+'</div>';
+  var sp='<div class="panel"><h3>Spools — avanço <span style="font-size:12px;color:var(--muted);font-family:var(--body)">clique no spool para dar avanço por junta</span></h3><table class="tbl"><thead><tr><th>Spool</th><th>DN</th><th>Juntas</th><th>PD</th><th>Fabricação</th><th>Montagem</th></tr></thead><tbody>'+
+    ss.map(function(s){return '<tr class="clic" onclick="abrirSpool(\''+id+'\',\''+s.cod+'\')"><td class="tg">'+s.cod+'</td><td>'+s.dn+'"</td><td>'+njuntas(s)+'</td><td>'+pd(s)+'</td><td>'+barCell(fasePct(s,'fab'))+'</td><td>'+barCell(fasePct(s,'campo'))+'</td></tr>';}).join('')+'</tbody></table></div>';
+  var supN=lineObj(d,'suportes').n;
+  var supPanel='<div class="panel"><h3>Suportes da linha <span style="font-size:12px;color:var(--muted);font-family:var(--body)">após montar todos os spools · '+linePct(d,'suportes',SUP_ET)+'%</span></h3><div style="margin-bottom:10px;font-size:13px;display:flex;align-items:center;gap:8px">Nº de suportes: '+(ed?'<input type="number" min="0" value="'+supN+'" onchange="setSupN(\''+id+'\',this.value)" style="width:80px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:5px 7px">':'<b>'+supN+'</b>')+'</div>'+lineEtapasHTML(id,'suportes',SUP_ET)+'</div>';
+  var testePanel='<div class="panel"><h3>Teste hidrostático <span style="font-size:12px;color:var(--muted);font-family:var(--body)">após linha + suportes · '+linePct(d,'teste',TESTE_ET)+'%</span></h3>'+lineEtapasHTML(id,'teste',TESTE_ET)+'</div>';
+  var verBtn='<div class="panel"><h3>Desenho e materiais</h3><button class="btn ghost" onclick="abrirDesenho(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver desenho e lista de materiais</button></div>';
+  document.getElementById('mBody').innerHTML=kp+sp+supPanel+testePanel+verBtn;
+  document.getElementById('modal').classList.add('on');
+}
 function abrirSpool(did,cod,fase){
   var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;
   var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;
