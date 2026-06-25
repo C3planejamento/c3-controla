@@ -257,6 +257,17 @@ button,input,select,textarea{font-family:inherit}
   .sheet,.sheet{max-width:100%}
 }
 </style>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.165.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.165.0/examples/jsm/"}}</script>
+<style>
+.m3d{position:fixed;inset:0;background:#0e1630;z-index:200;display:none;flex-direction:column}
+.m3d.on{display:flex}
+.m3dhead{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#0a1024;color:#cfe0ff;font-family:'Oswald',sans-serif;font-weight:700;font-size:15px}
+.m3dhead button{background:#1e2a52;color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px}
+#m3dCanvas{flex:1;position:relative;overflow:hidden}
+#m3dCanvas canvas{display:block}
+.m3dleg{position:absolute;bottom:14px;left:14px;background:rgba(10,16,36,.85);color:#cfe0ff;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.7}
+.m3dleg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:middle}
+</style>
 </head>
 <body data-tema="azul">
 
@@ -347,7 +358,7 @@ var JST=['s0','s1','s2','s3','s4','s5'];                                  /* est
 var JSTCOR=['#9aa3b8','#e8730c','#e0a32e','#1f9d4d','#2563eb','#7c4dff']; /* corte/lanç, acopl, IV+lib, solda, VT/LP, US */
 var JSTHEAD=['Corte/Lanç.','Acopl.','IV+Lib','Solda','VT/LP','US'];
 var SOLDA_IDX=3;
-var APPVER='v27';
+var APPVER='v28';
 /* Recurso por atividade: nº de etapas (peso de efetivo) que cada função executa por junta — só p/ cálculo de capacidade */
 var REC_MULT={fab:{cald:2,sold:2,insp_solda:2,insp_lp:2,insp_us:1},campo:{cald:4,sold:2,insp_solda:2,insp_lp:2,insp_us:1}};
 
@@ -355,6 +366,2604 @@ var REC_MULT={fab:{cald:2,sold:2,insp_solda:2,insp_lp:2,insp_us:1},campo:{cald:4
 var SEED={"desenhos": [{"iso": "REG-IS-0028-P-6328", "folha": "1 de 15", "mud": "2.1", "rev": "2", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 001", "dn": 6.0, "compr_mm": 4533.0, "juntas": [{"n": "1", "tipo": "J", "dn": 6.0}, {"n": "2", "tipo": "J", "dn": 6.0}, {"n": "3", "tipo": "J", "dn": 6.0}, {"n": "4", "tipo": "J", "dn": 6.0}, {"n": "5", "tipo": "J", "dn": 6.0}, {"n": "6", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 002", "dn": 6.0, "compr_mm": 2407.0, "juntas": [{"n": "7", "tipo": "J", "dn": 0}, {"n": "8", "tipo": "J", "dn": 6.0}, {"n": "9", "tipo": "J", "dn": 3.0}, {"n": "13", "tipo": "J", "dn": 6.0}, {"n": "14", "tipo": "J", "dn": 6.0}, {"n": "15", "tipo": "J", "dn": 6.0}, {"n": "16", "tipo": "JC", "dn": 6.0}, {"n": "10", "tipo": "JC", "dn": 3.0}, {"n": "11", "tipo": "J", "dn": 3.0}, {"n": "12", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 003", "dn": 3.0, "compr_mm": 5840.0, "juntas": [{"n": "17", "tipo": "J", "dn": 3.0}, {"n": "21", "tipo": "J", "dn": 6.0}, {"n": "22", "tipo": "J", "dn": 6.0}, {"n": "23", "tipo": "J", "dn": 6.0}, {"n": "24", "tipo": "JC", "dn": 6.0}, {"n": "18", "tipo": "JC", "dn": 3.0}, {"n": "19", "tipo": "J", "dn": 3.0}, {"n": "20", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 004", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "25", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 005", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "26", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 006", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "27", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 007", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "28", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 008", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "29", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 009", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "30", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 010", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "31", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 011", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "32", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 012", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "33", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 013", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "34", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 014", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "35", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 015", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "36", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D1", "cod": "P-6328 FL1", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "2 de 15", "mud": "2.1", "rev": "2", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 016", "dn": 3.0, "compr_mm": 2091.0, "juntas": [{"n": "37", "tipo": "J", "dn": 3.0}, {"n": "41", "tipo": "J", "dn": 6.0}, {"n": "42", "tipo": "J", "dn": 6.0}, {"n": "43", "tipo": "J", "dn": 6.0}, {"n": "44", "tipo": "JC", "dn": 6.0}, {"n": "38", "tipo": "JC", "dn": 3.0}, {"n": "39", "tipo": "J", "dn": 3.0}, {"n": "40", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 017", "dn": 6.0, "compr_mm": 2865.0, "juntas": [{"n": "45", "tipo": "J", "dn": 6.0}, {"n": "46", "tipo": "J", "dn": 6.0}, {"n": "47", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 018", "dn": 6.0, "compr_mm": 6800.0, "juntas": [{"n": "48", "tipo": "J", "dn": 6.0}, {"n": "49", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 019", "dn": 6.0, "compr_mm": 3445.0, "juntas": [{"n": "50", "tipo": "J", "dn": 6.0}, {"n": "51", "tipo": "J", "dn": 6.0}, {"n": "52", "tipo": "J", "dn": 6.0}, {"n": "53", "tipo": "J", "dn": 6.0}, {"n": "54", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 020", "dn": 6.0, "compr_mm": 6229.0, "juntas": [{"n": "55", "tipo": "J", "dn": 6.0}, {"n": "56", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D2", "cod": "P-6328 FL2", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "3 de 15", "mud": "2.1", "rev": "2", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 021", "dn": 3.0, "compr_mm": 3322.0, "juntas": [{"n": "57", "tipo": "J", "dn": 3.0}, {"n": "61", "tipo": "J", "dn": 6.0}, {"n": "62", "tipo": "J", "dn": 6.0}, {"n": "63", "tipo": "J", "dn": 6.0}, {"n": "64", "tipo": "J", "dn": 6.0}, {"n": "65", "tipo": "JC", "dn": 6.0}, {"n": "58", "tipo": "JC", "dn": 3.0}, {"n": "59", "tipo": "J", "dn": 3.0}, {"n": "60", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 022", "dn": 6.0, "compr_mm": 3197.0, "juntas": [{"n": "66", "tipo": "J", "dn": 6.0}, {"n": "67", "tipo": "J", "dn": 3.0}, {"n": "71", "tipo": "JC", "dn": 6.0}, {"n": "68", "tipo": "JC", "dn": 3.0}, {"n": "69", "tipo": "J", "dn": 3.0}, {"n": "70", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 023", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "72", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 024", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "73", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 025", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "74", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 026", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "75", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D3", "cod": "P-6328 FL3", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "4 de 15", "mud": "2.1", "rev": "2", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 027", "dn": 6.0, "compr_mm": 964.0, "juntas": [{"n": "76", "tipo": "J", "dn": 6.0}, {"n": "77", "tipo": "J", "dn": 6.0}, {"n": "78", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 028", "dn": 6.0, "compr_mm": 6080.0, "juntas": [{"n": "79", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 029", "dn": 6.0, "compr_mm": 1404.0, "juntas": [{"n": "80", "tipo": "J", "dn": 6.0}, {"n": "81", "tipo": "J", "dn": 3.0}, {"n": "85", "tipo": "J", "dn": 6.0}, {"n": "86", "tipo": "JC", "dn": 6.0}, {"n": "82", "tipo": "JC", "dn": 3.0}, {"n": "83", "tipo": "J", "dn": 3.0}, {"n": "84", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 030", "dn": 6.0, "compr_mm": 6080.0, "juntas": [{"n": "87", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 031", "dn": 6.0, "compr_mm": 964.0, "juntas": [{"n": "88", "tipo": "J", "dn": 6.0}, {"n": "89", "tipo": "J", "dn": 6.0}, {"n": "90", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D4", "cod": "P-6328 FL4", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "5 de 15", "mud": "2.1", "rev": "2", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 032", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "91", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 033", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "92", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 034", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "93", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 035", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "94", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 036", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "95", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 037", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "96", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 038", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "97", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 039", "dn": 3.0, "compr_mm": 1132.0, "juntas": [{"n": "98", "tipo": "J", "dn": 3.0}, {"n": "102", "tipo": "J", "dn": 6.0}, {"n": "103", "tipo": "J", "dn": 6.0}, {"n": "104", "tipo": "JC", "dn": 6.0}, {"n": "99", "tipo": "JC", "dn": 3.0}, {"n": "100", "tipo": "J", "dn": 3.0}, {"n": "101", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 040", "dn": 6.0, "compr_mm": 2797.0, "juntas": [{"n": "105", "tipo": "J", "dn": 6.0}, {"n": "106", "tipo": "J", "dn": 3.0}, {"n": "110", "tipo": "J", "dn": 6.0}, {"n": "111", "tipo": "J", "dn": 6.0}, {"n": "112", "tipo": "J", "dn": 6.0}, {"n": "113", "tipo": "JC", "dn": 6.0}, {"n": "107", "tipo": "JC", "dn": 3.0}, {"n": "108", "tipo": "J", "dn": 3.0}, {"n": "109", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D5", "cod": "P-6328 FL5", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "6 de 15", "mud": "2.1", "rev": "2", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 041", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "114", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 042", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "115", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 043", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "116", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 044", "dn": 6.0, "compr_mm": 2874.0, "juntas": [{"n": "117", "tipo": "J", "dn": 6.0}, {"n": "121", "tipo": "J", "dn": 6.0}, {"n": "122", "tipo": "JC", "dn": 6.0}, {"n": "118", "tipo": "JC", "dn": 3.0}, {"n": "119", "tipo": "J", "dn": 3.0}, {"n": "120", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 045", "dn": 6.0, "compr_mm": 2604.0, "juntas": [{"n": "123", "tipo": "J", "dn": 6.0}, {"n": "124", "tipo": "J", "dn": 6.0}, {"n": "125", "tipo": "J", "dn": 6.0}, {"n": "129", "tipo": "JC", "dn": 6.0}, {"n": "126", "tipo": "JC", "dn": 3.0}, {"n": "127", "tipo": "J", "dn": 3.0}, {"n": "128", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 046", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "130", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 047", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "131", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 048", "dn": 6.0, "compr_mm": 6229.0, "juntas": [{"n": "132", "tipo": "J", "dn": 6.0}, {"n": "133", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 049", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "134", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 050", "dn": 6.0, "compr_mm": 3725.0, "juntas": [{"n": "135", "tipo": "J", "dn": 6.0}, {"n": "136", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 051", "dn": 6.0, "compr_mm": 3724.0, "juntas": [{"n": "137", "tipo": "J", "dn": 6.0}, {"n": "138", "tipo": "J", "dn": 6.0}, {"n": "139", "tipo": "J", "dn": 6.0}, {"n": "140", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D6", "cod": "P-6328 FL6", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "7 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 052", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "141", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 053", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "142", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 054", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "143", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 055", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "144", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 056", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "145", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 057", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "146", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 058", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "147", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 059", "dn": 6.0, "compr_mm": 3545.0, "juntas": [{"n": "148", "tipo": "J", "dn": 6.0}, {"n": "149", "tipo": "J", "dn": 6.0}, {"n": "150", "tipo": "J", "dn": 6.0}, {"n": "151", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 060", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "152", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 061", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "153", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 062", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "154", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 063", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "155", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 064", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "156", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 065", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "157", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 066", "dn": 6.0, "compr_mm": 5017.0, "juntas": [{"n": "158", "tipo": "J", "dn": 6.0}, {"n": "159", "tipo": "J", "dn": 6.0}, {"n": "160", "tipo": "J", "dn": 6.0}, {"n": "161", "tipo": "J", "dn": 6.0}, {"n": "162", "tipo": "J", "dn": 6.0}, {"n": "163", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 067", "dn": 6.0, "compr_mm": 6229.0, "juntas": [{"n": "164", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 068", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "165", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 069", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "166", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 070", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "167", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 071", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "168", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 072", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "169", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D7", "cod": "P-6328 FL7", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "8 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 073", "dn": 3.0, "compr_mm": 5583.0, "juntas": [{"n": "170", "tipo": "J", "dn": 3.0}, {"n": "174", "tipo": "J", "dn": 6.0}, {"n": "175", "tipo": "J", "dn": 6.0}, {"n": "176", "tipo": "JC", "dn": 6.0}, {"n": "171", "tipo": "JC", "dn": 3.0}, {"n": "172", "tipo": "J", "dn": 3.0}, {"n": "173", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 074", "dn": 6.0, "compr_mm": 3152.0, "juntas": [{"n": "177", "tipo": "J", "dn": 6.0}, {"n": "178", "tipo": "J", "dn": 6.0}, {"n": "179", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 075", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "180", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 076", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "181", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 077", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "182", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 078", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "183", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 079", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "184", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 080", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "185", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 081", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "186", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 082", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "187", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 083", "dn": 3.0, "compr_mm": 4677.0, "juntas": [{"n": "188", "tipo": "J", "dn": 3.0}, {"n": "192", "tipo": "J", "dn": 6.0}, {"n": "193", "tipo": "J", "dn": 6.0}, {"n": "194", "tipo": "J", "dn": 6.0}, {"n": "195", "tipo": "JC", "dn": 6.0}, {"n": "189", "tipo": "JC", "dn": 3.0}, {"n": "190", "tipo": "J", "dn": 3.0}, {"n": "191", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D8", "cod": "P-6328 FL8", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "9 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 084", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "196", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 085", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "197", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 086", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "198", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 087", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "199", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 088", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "200", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 089", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "201", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 090", "dn": 3.0, "compr_mm": 4983.0, "juntas": [{"n": "202", "tipo": "J", "dn": 3.0}, {"n": "206", "tipo": "J", "dn": 6.0}, {"n": "207", "tipo": "J", "dn": 6.0}, {"n": "208", "tipo": "JC", "dn": 6.0}, {"n": "203", "tipo": "JC", "dn": 3.0}, {"n": "204", "tipo": "J", "dn": 3.0}, {"n": "205", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 091", "dn": 6.0, "compr_mm": 5338.0, "juntas": [{"n": "209", "tipo": "J", "dn": 6.0}, {"n": "210", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 092", "dn": 6.0, "compr_mm": 2552.0, "juntas": [{"n": "211", "tipo": "J", "dn": 6.0}, {"n": "212", "tipo": "J", "dn": 3.0}, {"n": "216", "tipo": "J", "dn": 6.0}, {"n": "217", "tipo": "JC", "dn": 6.0}, {"n": "213", "tipo": "JC", "dn": 3.0}, {"n": "214", "tipo": "J", "dn": 3.0}, {"n": "215", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D9", "cod": "P-6328 FL9", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "10 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 093", "dn": 6.0, "compr_mm": 4500.0, "juntas": [{"n": "218", "tipo": "J", "dn": 6.0}, {"n": "219", "tipo": "J", "dn": 6.0}, {"n": "220", "tipo": "J", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 094", "dn": 6.0, "compr_mm": 2793.0, "juntas": [{"n": "221", "tipo": "J", "dn": 6.0}, {"n": "222", "tipo": "J", "dn": 3.0}, {"n": "226", "tipo": "JC", "dn": 6.0}, {"n": "223", "tipo": "JC", "dn": 3.0}, {"n": "224", "tipo": "J", "dn": 3.0}, {"n": "225", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 095", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "227", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 096", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "228", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 097", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "229", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 098", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "230", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 099", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "231", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 100", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "232", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 101", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "233", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 102", "dn": 6.0, "compr_mm": 4000.0, "juntas": [{"n": "234", "tipo": "J", "dn": 6.0}, {"n": "235", "tipo": "J", "dn": 6.0}, {"n": "236", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 103", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "237", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 104", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "238", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 105", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "239", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 106", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "240", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 107", "dn": 6.0, "compr_mm": 4749.0, "juntas": [{"n": "241", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D10", "cod": "P-6328 FL10", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "11 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 108", "dn": 6.0, "compr_mm": 2567.0, "juntas": [{"n": "242", "tipo": "J", "dn": 6.0}, {"n": "243", "tipo": "J", "dn": 3.0}, {"n": "247", "tipo": "JC", "dn": 6.0}, {"n": "244", "tipo": "JC", "dn": 3.0}, {"n": "245", "tipo": "J", "dn": 3.0}, {"n": "246", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 109", "dn": 6.0, "compr_mm": 2358.0, "juntas": [{"n": "248", "tipo": "J", "dn": 6.0}, {"n": "249", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 110", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "250", "tipo": "J", "dn": 6.0}, {"n": "251", "tipo": "J", "dn": 6.0}, {"n": "252", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 111", "dn": 3.0, "compr_mm": 2849.0, "juntas": [{"n": "253", "tipo": "J", "dn": 3.0}, {"n": "257", "tipo": "JC", "dn": 6.0}, {"n": "254", "tipo": "JC", "dn": 3.0}, {"n": "255", "tipo": "J", "dn": 3.0}, {"n": "256", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 112", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "258", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 113", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "259", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 114", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "260", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 115", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "261", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 116", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "262", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 117", "dn": 6.0, "compr_mm": 3000.0, "juntas": [{"n": "263", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 118", "dn": 6.0, "compr_mm": 3965.0, "juntas": [{"n": "264", "tipo": "J", "dn": 6.0}, {"n": "265", "tipo": "J", "dn": 6.0}, {"n": "266", "tipo": "J", "dn": 6.0}, {"n": "267", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D11", "cod": "P-6328 FL11", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "12 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 119", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "268", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 120", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "269", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 121", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "270", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 122", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "271", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 123", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "272", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 124", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "273", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 125", "dn": 6.0, "compr_mm": 5202.0, "juntas": [{"n": "274", "tipo": "J", "dn": 6.0}, {"n": "275", "tipo": "J", "dn": 6.0}, {"n": "276", "tipo": "J", "dn": 6.0}, {"n": "277", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 126", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "278", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 127", "dn": 6.0, "compr_mm": 0, "juntas": [{"n": "279", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 128", "dn": 6.0, "compr_mm": 0, "juntas": [{"n": "280", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 129", "dn": 3.0, "compr_mm": 4497.0, "juntas": [{"n": "281", "tipo": "J", "dn": 3.0}, {"n": "285", "tipo": "J", "dn": 6.0}, {"n": "286", "tipo": "J", "dn": 6.0}, {"n": "282", "tipo": "JC", "dn": 3.0}, {"n": "283", "tipo": "J", "dn": 3.0}, {"n": "284", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D12", "cod": "P-6328 FL12", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6328", "folha": "13 de 15", "mud": "2.1", "rev": "1", "linha": "6\"-0028-P-6328-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 130", "dn": 6.0, "compr_mm": 2757.0, "juntas": [{"n": "287", "tipo": "J", "dn": 6.0}, {"n": "288", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 131", "dn": 6.0, "compr_mm": 4501.0, "juntas": [{"n": "289", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 132", "dn": 6.0, "compr_mm": 1800.0, "juntas": [{"n": "290", "tipo": "J", "dn": 6.0}, {"n": "291", "tipo": "J", "dn": 6.0}, {"n": "292", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 133", "dn": 6.0, "compr_mm": 2899.0, "juntas": [{"n": "293", "tipo": "J", "dn": 6.0}, {"n": "294", "tipo": "JC", "dn": 6.0}, {"n": "295", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 134", "dn": 6.0, "compr_mm": 5139.0, "juntas": [{"n": "296", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 135", "dn": 6.0, "compr_mm": 4500.0, "juntas": [{"n": "297", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 136", "dn": 6.0, "compr_mm": 5499.0, "juntas": [{"n": "298", "tipo": "J", "dn": 6.0}, {"n": "299", "tipo": "J", "dn": 6.0}, {"n": "300", "tipo": "J", "dn": 6.0}, {"n": "301", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 137", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "302", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 138", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "303", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 139", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "304", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 140", "dn": 6.0, "compr_mm": 6000.0, "juntas": [{"n": "305", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D13", "cod": "P-6328 FL13", "desc": "6\"-0028-P-6328-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "2 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 001", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "306", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 002", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "307", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 003", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "308", "tipo": "JC", "dn": 6.0}, {"n": "309", "tipo": "JC", "dn": 3.0}, {"n": "310", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 004", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "311", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 005", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "312", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 006", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "313", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 007", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "314", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 008", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "315", "tipo": "JC", "dn": 6.0}, {"n": "316", "tipo": "JC", "dn": 3.0}, {"n": "317", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 009", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "318", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 010", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "319", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D14", "cod": "P-6335 FL2", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "3 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 011", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "320", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 012", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "321", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 013", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "322", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 014", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "323", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 015", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "324", "tipo": "JC", "dn": 6.0}, {"n": "325", "tipo": "JC", "dn": 3.0}, {"n": "326", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 016", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "327", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 017", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "328", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 018", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "329", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 019", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "330", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 020", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "331", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 021", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "332", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 022", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "333", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 023", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "334", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 024", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "335", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 025", "dn": 6.0, "compr_mm": 4700.0, "juntas": [{"n": "336", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D15", "cod": "P-6335 FL3", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "4 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 026", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "337", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 027", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "338", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 028", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "339", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 029", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "340", "tipo": "JC", "dn": 6.0}, {"n": "341", "tipo": "JC", "dn": 3.0}, {"n": "342", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 030", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "343", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 031", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "344", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 032", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "345", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 033", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "346", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 034", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "347", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 035", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "348", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 036", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "349", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 037", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "350", "tipo": "JC", "dn": 6.0}, {"n": "351", "tipo": "JC", "dn": 3.0}, {"n": "352", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 038", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "353", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 039", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "354", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 040", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "355", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 041", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "356", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 042", "dn": 6.0, "compr_mm": 3700.0, "juntas": [{"n": "357", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D16", "cod": "P-6335 FL4", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "5 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 043", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "358", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 044", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "359", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 045", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "360", "tipo": "JC", "dn": 6.0}, {"n": "361", "tipo": "JC", "dn": 3.0}, {"n": "362", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 046", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "363", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 047", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "364", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 048", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "365", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 049", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "366", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 050", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "367", "tipo": "JC", "dn": 6.0}, {"n": "368", "tipo": "JC", "dn": 3.0}, {"n": "369", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 051", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "370", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 052", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "371", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D17", "cod": "P-6335 FL5", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "6 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 053", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "372", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 054", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "373", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 055", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "374", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 056", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "375", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 057", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "376", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 058", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "377", "tipo": "JC", "dn": 6.0}, {"n": "378", "tipo": "JC", "dn": 3.0}, {"n": "379", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 059", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "380", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 060", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "381", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 061", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "382", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 062", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "383", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 063", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "384", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 064", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "385", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 065", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "386", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 066", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "387", "tipo": "JC", "dn": 6.0}, {"n": "388", "tipo": "JC", "dn": 3.0}, {"n": "389", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 067", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "390", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 068", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "391", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 069", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "392", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 070", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "393", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 071", "dn": 6.0, "compr_mm": 5000.0, "juntas": [{"n": "394", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D18", "cod": "P-6335 FL6", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "7 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 072", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "395", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 073", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "396", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 074", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "397", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 075", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "398", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 076", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "399", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 077", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "400", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 078", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "401", "tipo": "JC", "dn": 6.0}, {"n": "402", "tipo": "JC", "dn": 3.0}, {"n": "403", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 079", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "404", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 080", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "405", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 081", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "406", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 082", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "407", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 083", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "408", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 084", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "409", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 085", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "410", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 086", "dn": 6.0, "compr_mm": 5500.0, "juntas": [{"n": "411", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D19", "cod": "P-6335 FL7", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "8 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 087", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "412", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 088", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "413", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 089", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "414", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 090", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "415", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 091", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "416", "tipo": "JC", "dn": 6.0}, {"n": "417", "tipo": "JC", "dn": 3.0}, {"n": "418", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 092", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "419", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 093", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "420", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 094", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "421", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 095", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "422", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 096", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "423", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 097", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "424", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 098", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "425", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 099", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "426", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 100", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "427", "tipo": "JC", "dn": 6.0}, {"n": "428", "tipo": "JC", "dn": 3.0}, {"n": "429", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 101", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "430", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 102", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "431", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 103", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "432", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 104", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "433", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 105", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "434", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D20", "cod": "P-6335 FL8", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "9 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 106", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "435", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 107", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "436", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 108", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "437", "tipo": "JC", "dn": 6.0}, {"n": "438", "tipo": "JC", "dn": 3.0}, {"n": "439", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 109", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "440", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 110", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "441", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 111", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "442", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 112", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "443", "tipo": "JC", "dn": 6.0}, {"n": "444", "tipo": "JC", "dn": 3.0}, {"n": "445", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 113", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "446", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 114", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "447", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 115", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "448", "tipo": "JC", "dn": 6.0}, {"n": "449", "tipo": "JC", "dn": 3.0}, {"n": "450", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 116", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "451", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 117", "dn": 6.0, "compr_mm": 3300.0, "juntas": [{"n": "452", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D21", "cod": "P-6335 FL9", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "10 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 118", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "453", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 119", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "454", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 120", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "455", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 121", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "456", "tipo": "JC", "dn": 6.0}, {"n": "457", "tipo": "JC", "dn": 3.0}, {"n": "458", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 122", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "459", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 123", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "460", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 124", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "461", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 125", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "462", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 126", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "463", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 127", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "464", "tipo": "JC", "dn": 6.0}, {"n": "465", "tipo": "JC", "dn": 3.0}, {"n": "466", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 128", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "467", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 129", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "468", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 130", "dn": 6.0, "compr_mm": 3800.0, "juntas": [{"n": "469", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D22", "cod": "P-6335 FL10", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}, {"iso": "REG-IS-0028-P-6335", "folha": "11 de 14", "mud": "4.1", "rev": "1", "linha": "6\"-0028-P-6335-Ba", "area": "U-0028", "cli": "REGAP", "prog": "PHASE-OUT DIESEL S-500", "spools": [{"cod": "SP 131", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "470", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 132", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "471", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 133", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "472", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 134", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "473", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 135", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "474", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 136", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "475", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 137", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "476", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 138", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "477", "tipo": "JC", "dn": 6.0}, {"n": "478", "tipo": "JC", "dn": 3.0}, {"n": "479", "tipo": "J", "dn": 3.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 139", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "480", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 140", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "481", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 141", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "482", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 142", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "483", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 143", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "484", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 144", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "485", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}, {"cod": "SP 145", "dn": 6.0, "compr_mm": 5200.0, "juntas": [{"n": "486", "tipo": "JC", "dn": 6.0}], "fase": "fab", "fab": {}, "campo": {}}], "id": "D23", "cod": "P-6335 FL11", "desc": "6\"-0028-P-6335-Ba", "dnp": 6.0}]};
 var SPOOLPOS={"D1": {"SP 001": {"x": 71.65, "y": 84.56}, "SP 002": {"x": 21.31, "y": 40.61}, "SP 003": {"x": 64.24, "y": 13.12}, "SP 004": {"x": 60.29, "y": 35.65}, "SP 005": {"x": 56.07, "y": 39.08}, "SP 006": {"x": 51.87, "y": 42.53}, "SP 007": {"x": 47.66, "y": 45.95}, "SP 008": {"x": 43.46, "y": 49.38}, "SP 009": {"x": 39.24, "y": 52.83}, "SP 010": {"x": 35.04, "y": 56.26}, "SP 011": {"x": 30.87, "y": 59.7}, "SP 012": {"x": 26.63, "y": 63.13}, "SP 013": {"x": 22.41, "y": 66.58}, "SP 014": {"x": 18.2, "y": 70.0}, "SP 015": {"x": 14.0, "y": 73.45}}, "D2": {"SP 016": {"x": 54.11, "y": 28.42}, "SP 017": {"x": 57.0, "y": 41.98}, "SP 018": {"x": 36.65, "y": 38.78}, "SP 019": {"x": 10.19, "y": 31.88}, "SP 020": {"x": 32.81, "y": 53.05}}, "D3": {"SP 021": {"x": 71.13, "y": 23.86}, "SP 022": {"x": 52.67, "y": 27.85}, "SP 023": {"x": 48.42, "y": 43.86}, "SP 024": {"x": 37.89, "y": 52.47}, "SP 025": {"x": 27.37, "y": 61.05}, "SP 026": {"x": 16.83, "y": 69.64}}, "D4": {"SP 027": {"x": 71.55, "y": 50.35}, "SP 028": {"x": 54.69, "y": 49.08}, "SP 029": {"x": 10.99, "y": 24.81}, "SP 030": {"x": 43.59, "y": 51.82}, "SP 031": {"x": 45.08, "y": 65.53}}, "D5": {"SP 032": {"x": 63.94, "y": 26.88}, "SP 033": {"x": 55.03, "y": 34.16}, "SP 034": {"x": 46.67, "y": 41.0}, "SP 035": {"x": 36.03, "y": 49.66}, "SP 036": {"x": 29.52, "y": 54.99}, "SP 037": {"x": 23.31, "y": 60.07}, "SP 038": {"x": 17.13, "y": 65.11}, "SP 039": {"x": 20.84, "y": 38.78}, "SP 040": {"x": 19.27, "y": 27.65}}, "D6": {"SP 041": {"x": 71.84, "y": 29.75}, "SP 042": {"x": 64.21, "y": 35.94}, "SP 043": {"x": 56.07, "y": 42.59}, "SP 044": {"x": 48.62, "y": 48.68}, "SP 045": {"x": 48.78, "y": 40.83}, "SP 046": {"x": 37.86, "y": 30.69}, "SP 047": {"x": 31.79, "y": 25.74}, "SP 048": {"x": 28.45, "y": 23.01}, "SP 049": {"x": 23.03, "y": 21.68}, "SP 050": {"x": 14.15, "y": 24.47}, "SP 051": {"x": 8.44, "y": 25.84}}, "D7": {"SP 052": {"x": 66.94, "y": 65.33}, "SP 053": {"x": 62.08, "y": 60.77}, "SP 054": {"x": 57.86, "y": 57.91}, "SP 055": {"x": 54.65, "y": 55.29}, "SP 056": {"x": 51.66, "y": 52.85}, "SP 057": {"x": 48.65, "y": 50.39}, "SP 058": {"x": 45.61, "y": 47.91}, "SP 059": {"x": 40.25, "y": 51.92}, "SP 060": {"x": 39.45, "y": 56.88}, "SP 061": {"x": 34.15, "y": 52.49}, "SP 062": {"x": 29.01, "y": 48.33}, "SP 063": {"x": 24.15, "y": 44.36}, "SP 064": {"x": 18.66, "y": 39.89}, "SP 065": {"x": 13.21, "y": 35.45}, "SP 066": {"x": 41.29, "y": 33.34}, "SP 067": {"x": 57.4, "y": 21.32}, "SP 068": {"x": 53.87, "y": 18.42}, "SP 069": {"x": 50.44, "y": 15.64}, "SP 070": {"x": 47.02, "y": 12.83}, "SP 071": {"x": 43.9, "y": 10.25}, "SP 072": {"x": 40.44, "y": 7.45}}, "D8": {}, "D9": {"SP 084": {"x": 62.76, "y": 69.32}, "SP 085": {"x": 56.92, "y": 64.54}, "SP 086": {"x": 52.41, "y": 60.87}, "SP 087": {"x": 41.93, "y": 52.3}, "SP 088": {"x": 36.92, "y": 48.21}, "SP 089": {"x": 31.5, "y": 43.8}, "SP 090": {"x": 25.64, "y": 27.99}, "SP 091": {"x": 15.55, "y": 20.72}, "SP 092": {"x": 24.0, "y": 13.22}}, "D10": {"SP 093": {"x": 70.81, "y": 55.59}, "SP 094": {"x": 65.47, "y": 65.35}, "SP 095": {"x": 61.28, "y": 61.92}, "SP 096": {"x": 57.1, "y": 58.51}, "SP 097": {"x": 52.92, "y": 55.11}, "SP 098": {"x": 48.73, "y": 51.68}, "SP 099": {"x": 44.56, "y": 48.27}, "SP 100": {"x": 40.38, "y": 44.87}, "SP 101": {"x": 36.23, "y": 41.44}, "SP 102": {"x": 36.2, "y": 35.88}, "SP 103": {"x": 28.59, "y": 23.88}, "SP 104": {"x": 24.2, "y": 20.29}, "SP 105": {"x": 21.05, "y": 17.71}, "SP 106": {"x": 17.3, "y": 14.65}, "SP 107": {"x": 13.61, "y": 11.64}}, "D11": {"SP 108": {"x": 60.31, "y": 42.55}, "SP 109": {"x": 68.83, "y": 53.23}, "SP 110": {"x": 68.83, "y": 58.67}, "SP 111": {"x": 52.28, "y": 19.35}, "SP 112": {"x": 47.22, "y": 25.9}, "SP 113": {"x": 41.74, "y": 30.39}, "SP 114": {"x": 37.57, "y": 33.8}, "SP 115": {"x": 31.14, "y": 39.04}, "SP 116": {"x": 24.45, "y": 44.52}, "SP 117": {"x": 19.16, "y": 48.84}, "SP 118": {"x": 16.34, "y": 42.23}}, "D12": {"SP 119": {"x": 69.37, "y": 66.23}, "SP 120": {"x": 64.27, "y": 62.36}, "SP 121": {"x": 59.4, "y": 58.05}, "SP 122": {"x": 54.04, "y": 53.98}, "SP 123": {"x": 49.1, "y": 49.68}, "SP 124": {"x": 43.63, "y": 45.23}, "SP 125": {"x": 35.62, "y": 41.82}, "SP 126": {"x": 31.4, "y": 38.42}, "SP 127": {"x": 25.9, "y": 34.22}, "SP 128": {"x": 20.81, "y": 29.32}, "SP 129": {"x": 14.27, "y": 23.68}}, "D13": {"SP 130": {"x": 75.93, "y": 68.67}, "SP 131": {"x": 69.79, "y": 67.89}, "SP 132": {"x": 70.09, "y": 62.12}, "SP 133": {"x": 65.15, "y": 53.84}, "SP 134": {"x": 53.45, "y": 49.12}, "SP 135": {"x": 47.25, "y": 44.22}, "SP 136": {"x": 38.29, "y": 40.94}, "SP 137": {"x": 34.47, "y": 34.14}, "SP 138": {"x": 28.55, "y": 29.3}, "SP 139": {"x": 22.02, "y": 23.96}, "SP 140": {"x": 13.88, "y": 17.31}}, "D14": {"SP 001": {"x": 58.21, "y": 44.55}, "SP 002": {"x": 51.24, "y": 49.71}, "SP 003": {"x": 40.3, "y": 45.36}, "SP 004": {"x": 38.82, "y": 49.0}, "SP 005": {"x": 37.8, "y": 53.84}, "SP 006": {"x": 34.37, "y": 60.28}, "SP 007": {"x": 32.64, "y": 63.18}, "SP 008": {"x": 29.37, "y": 81.06}, "SP 009": {"x": 25.42, "y": 93.32}, "SP 010": {"x": 23.89, "y": 93.32}}, "D15": {"SP 011": {"x": 64.94, "y": 37.45}, "SP 012": {"x": 53.27, "y": 26.91}, "SP 013": {"x": 53.46, "y": 46.37}, "SP 014": {"x": 57.06, "y": 60.03}, "SP 015": {"x": 51.82, "y": 72.67}, "SP 016": {"x": 48.24, "y": 80.95}, "SP 017": {"x": 42.79, "y": 94.56}, "SP 018": {"x": 41.31, "y": 99.15}, "SP 019": {"x": 46.95, "y": 21.6}, "SP 020": {"x": 40.87, "y": 36.13}, "SP 021": {"x": 36.44, "y": 47.03}, "SP 022": {"x": 32.61, "y": 56.98}, "SP 023": {"x": 28.25, "y": 66.73}, "SP 024": {"x": 23.47, "y": 79.31}, "SP 025": {"x": 19.42, "y": 88.39}}, "D16": {"SP 026": {"x": 30.69, "y": 19.12}, "SP 027": {"x": 25.54, "y": 21.89}, "SP 028": {"x": 26.32, "y": 27.89}, "SP 029": {"x": 28.6, "y": 29.53}, "SP 030": {"x": 28.89, "y": 35.91}, "SP 031": {"x": 31.61, "y": 36.98}, "SP 032": {"x": 32.02, "y": 43.59}, "SP 033": {"x": 36.08, "y": 47.86}, "SP 034": {"x": 43.09, "y": 53.54}, "SP 035": {"x": 46.59, "y": 53.54}, "SP 036": {"x": 48.77, "y": 59.79}, "SP 037": {"x": 53.44, "y": 64.96}, "SP 038": {"x": 50.27, "y": 72.73}, "SP 039": {"x": 47.38, "y": 79.78}, "SP 040": {"x": 41.69, "y": 93.76}, "SP 041": {"x": 39.58, "y": 98.95}, "SP 042": {"x": 32.83, "y": 101.8}}, "D17": {"SP 043": {"x": 52.08, "y": 20.51}, "SP 044": {"x": 49.17, "y": 27.48}, "SP 045": {"x": 43.97, "y": 39.86}, "SP 046": {"x": 40.8, "y": 47.77}, "SP 047": {"x": 37.73, "y": 54.44}, "SP 048": {"x": 35.0, "y": 61.24}, "SP 049": {"x": 31.81, "y": 69.69}, "SP 050": {"x": 27.24, "y": 80.86}, "SP 051": {"x": 35.5, "y": 98.81}, "SP 052": {"x": 15.31, "y": 107.03}}, "D18": {"SP 053": {"x": 57.34, "y": 38.42}, "SP 054": {"x": 54.96, "y": 44.28}, "SP 055": {"x": 52.94, "y": 50.04}, "SP 056": {"x": 54.47, "y": 62.86}, "SP 057": {"x": 45.95, "y": 66.4}, "SP 058": {"x": 43.12, "y": 73.04}, "SP 059": {"x": 40.6, "y": 79.72}, "SP 060": {"x": 44.75, "y": 97.5}, "SP 061": {"x": 42.42, "y": 30.81}, "SP 062": {"x": 38.6, "y": 37.48}, "SP 063": {"x": 36.51, "y": 43.07}, "SP 064": {"x": 34.42, "y": 48.16}, "SP 065": {"x": 32.58, "y": 53.29}, "SP 066": {"x": 30.44, "y": 57.99}, "SP 067": {"x": 28.44, "y": 62.81}, "SP 068": {"x": 26.49, "y": 68.29}, "SP 069": {"x": 24.5, "y": 73.05}, "SP 070": {"x": 22.42, "y": 78.27}, "SP 071": {"x": 20.72, "y": 98.71}}, "D19": {"SP 072": {"x": 47.57, "y": 24.95}, "SP 073": {"x": 44.23, "y": 31.51}, "SP 074": {"x": 38.34, "y": 40.96}, "SP 075": {"x": 39.13, "y": 47.57}, "SP 076": {"x": 28.94, "y": 50.45}, "SP 077": {"x": 28.94, "y": 56.07}, "SP 078": {"x": 30.0, "y": 72.06}, "SP 079": {"x": 64.28, "y": 58.23}, "SP 080": {"x": 54.55, "y": 57.26}, "SP 081": {"x": 55.45, "y": 73.3}, "SP 082": {"x": 55.16, "y": 81.36}, "SP 083": {"x": 53.1, "y": 84.07}, "SP 084": {"x": 51.57, "y": 89.81}, "SP 085": {"x": 49.49, "y": 97.02}, "SP 086": {"x": 36.44, "y": 99.78}}, "D20": {"SP 087": {"x": 60.71, "y": 29.88}, "SP 088": {"x": 59.46, "y": 35.29}, "SP 089": {"x": 57.49, "y": 40.59}, "SP 090": {"x": 55.55, "y": 45.01}, "SP 091": {"x": 53.35, "y": 50.05}, "SP 092": {"x": 51.74, "y": 54.95}, "SP 093": {"x": 49.36, "y": 59.56}, "SP 094": {"x": 46.43, "y": 60.71}, "SP 095": {"x": 39.65, "y": 76.3}, "SP 096": {"x": 50.02, "y": 81.08}, "SP 097": {"x": 47.29, "y": 87.36}, "SP 098": {"x": 44.19, "y": 93.56}, "SP 099": {"x": 42.02, "y": 100.8}, "SP 100": {"x": 39.38, "y": 107.07}, "SP 101": {"x": 23.03, "y": 19.31}, "SP 102": {"x": 18.42, "y": 32.98}, "SP 103": {"x": 22.08, "y": 43.59}, "SP 104": {"x": 23.18, "y": 53.83}, "SP 105": {"x": 25.52, "y": 58.45}}, "D21": {"SP 106": {"x": 25.49, "y": 20.72}, "SP 107": {"x": 18.63, "y": 26.12}, "SP 108": {"x": 24.74, "y": 41.6}, "SP 109": {"x": 27.05, "y": 47.26}, "SP 110": {"x": 28.58, "y": 51.03}, "SP 111": {"x": 30.82, "y": 56.55}, "SP 112": {"x": 33.99, "y": 64.29}, "SP 113": {"x": 36.09, "y": 69.39}, "SP 114": {"x": 39.66, "y": 78.16}, "SP 115": {"x": 42.6, "y": 85.38}, "SP 116": {"x": 48.81, "y": 85.65}, "SP 117": {"x": 58.9, "y": 79.92}}, "D22": {"SP 118": {"x": 29.56, "y": 31.15}, "SP 119": {"x": 17.12, "y": 40.17}, "SP 120": {"x": 20.34, "y": 48.65}, "SP 121": {"x": 22.73, "y": 55.15}, "SP 122": {"x": 26.47, "y": 63.79}, "SP 123": {"x": 32.17, "y": 77.69}, "SP 124": {"x": 37.16, "y": 89.78}, "SP 125": {"x": 41.88, "y": 104.62}, "SP 126": {"x": 38.11, "y": 32.38}, "SP 127": {"x": 56.03, "y": 50.89}, "SP 128": {"x": 58.15, "y": 25.27}, "SP 129": {"x": 64.47, "y": 31.68}, "SP 130": {"x": 64.72, "y": 53.93}}, "D23": {"SP 131": {"x": 47.05, "y": 22.62}, "SP 132": {"x": 39.85, "y": 46.84}, "SP 133": {"x": 42.67, "y": 53.09}, "SP 134": {"x": 46.53, "y": 61.58}, "SP 135": {"x": 50.34, "y": 70.39}, "SP 136": {"x": 53.85, "y": 79.42}, "SP 138": {"x": 18.11, "y": 42.23}, "SP 139": {"x": 20.97, "y": 49.22}, "SP 140": {"x": 25.21, "y": 59.6}, "SP 141": {"x": 28.22, "y": 67.01}, "SP 142": {"x": 31.79, "y": 75.72}, "SP 143": {"x": 34.74, "y": 82.92}, "SP 144": {"x": 38.44, "y": 91.98}, "SP 145": {"x": 45.14, "y": 106.66}}};
 var SEEDMAT={"D1": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "83.0M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "TE SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6 x 6", "qtde": "1"}, {"pos": 4, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 5, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "6"}, {"pos": 6, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "FLANGE PE 150# SCH 40 FR AFO ASTM A105 CONF ASME B16.5", "diam": "6", "qtde": "2"}, {"pos": 8, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 9, "desc": "FLANGE CEGO 150# FR AFO ASTM A105 CONF ASME B16.5", "diam": "6", "qtde": "1"}, {"pos": 10, "desc": "JUNTA ESPIR 150# FR ESP 4.4 MM AISI 304 C/ ENCHIM GRAFITE FLEX E ANEIS EXT EM AC E INT EM ", "diam": "6", "qtde": "3"}, {"pos": 11, "desc": "\" COMP. PARAFUSO ESTOJO 150# AL ASTM A193 B7 PORCAS EM ASTM A194 2H HEX SERIE PESADA CONF ", "diam": "3/4", "qtde": "24"}, {"pos": 12, "desc": "V GAVETA 150# FLG FR AFU ASTM A216 GR WCB TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76", "diam": "6", "qtde": "1"}, {"pos": 13, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 1", "qtde": "21"}], "D2": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "16.9M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "7"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 2", "qtde": "3"}], "D3": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "29.2M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "3"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 3", "qtde": "8"}], "D4": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "13.5M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "2"}, {"pos": 5, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "4"}, {"pos": 6, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 8, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 4", "qtde": "2"}], "D5": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "32.4M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "4"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 5", "qtde": "8"}], "D6": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "53.9M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "6"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 6", "qtde": "12"}], "D7": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "123.2M"}, {"pos": 2, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9 LISTA DE SUPORTES", "diam": "6", "qtde": "5"}, {"pos": 3, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 7", "qtde": "24"}], "D8": [], "D9": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "47.3M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "4"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 9", "qtde": "10"}], "D10": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "80.4M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "4"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 10", "qtde": "20"}], "D11": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "31.1M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "5"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 11", "qtde": "8"}], "D12": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "63.1M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "2"}, {"pos": 5, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "1"}, {"pos": 6, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N­76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 8, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 12", "qtde": "23"}], "D13": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "49.6M"}, {"pos": 2, "desc": "TE SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6 x 6", "qtde": "1"}, {"pos": 3, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "1"}, {"pos": 4, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9 LISTA DE SUPORTES", "diam": "6", "qtde": "4"}, {"pos": 5, "desc": "VER DES PADRAO OU REFERENCIA 6\"­0028­P­6328­Ba IS­5250.00­6100­200­LVC­001 REG­IS­0028­P­6", "diam": "6 13", "qtde": "14"}], "D14": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "47.4M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "TE SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6 x 6", "qtde": "1"}, {"pos": 4, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 5, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "4"}, {"pos": 6, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "2"}, {"pos": 7, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 8, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 9, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-0179-LVC-008 REG-IS-0028-P-", "diam": "6 2", "qtde": "13"}], "D15": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "70.9M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "4"}, {"pos": 5, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "2"}, {"pos": 6, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 8, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-0179-LVC-008 REG-IS-0028-P-", "diam": "6 3", "qtde": "25"}], "D16": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "63.0M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "6"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-0179-LVC-008 REG-IS-0028-P-", "diam": "6 4", "qtde": "15"}], "D17": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "55.0M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "7"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS-0028-P-6", "diam": "6 5", "qtde": "14"}], "D18": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 6 CONF ASME B36.10", "diam": "", "qtde": "94.9M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF 6 ASME B16.11", "diam": "x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM 6 A234 WPB CONF ASME B16.9", "diam": "", "qtde": "5"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA N-1758 6 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS", "diam": "6", "qtde": "19"}], "D19": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "82.0M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "5"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS-0028-P-6", "diam": "6 7", "qtde": "16"}], "D20": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "98.9M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "5"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "2"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "2"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS-0028-P-6", "diam": "6 8", "qtde": "21"}], "D21": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "39.6M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.6M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "3"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "6"}, {"pos": 5, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "1"}, {"pos": 6, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "3"}, {"pos": 7, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "3"}, {"pos": 8, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS-0028-P-6", "diam": "9", "qtde": "9"}], "D22": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "50.0M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.4M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "2"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "8"}, {"pos": 5, "desc": "CURVA 45 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "1"}, {"pos": 6, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 8, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 9, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 10, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS-0028-P-6", "diam": "6 10", "qtde": "11"}], "D23": [{"pos": 1, "desc": "TUBO PC SC OU CC SCH 40 AC API 5L B PSL1 CONF ASME B36.10", "diam": "6", "qtde": "78.6M"}, {"pos": 2, "desc": "TUBO PL SC SCH 160 AC API 5L B PSL1 CONF ASME B36.10", "diam": "3/4", "qtde": "0.2M"}, {"pos": 3, "desc": "MEIA LUVA 6000# ES AFO ASTM A105 CONF ASME B16.11", "diam": "6 x 3/4", "qtde": "1"}, {"pos": 4, "desc": "CURVA 90 GRAUS RL SCH 40 PC AC ASTM A234 WPB CONF ASME B16.9", "diam": "6", "qtde": "7"}, {"pos": 5, "desc": "TAMPAO COM MANIPULO E CORRENTE 6000# RO AFO ASTM A105 CONF ASME B16.11", "diam": "3/4", "qtde": "1"}, {"pos": 6, "desc": "V GAVETA 800# ES AFO ASTM A105 TRIM A (OB AISI 410 SEDE STELLITE) CONFORME N-76 AN A HARE ", "diam": "3/4", "qtde": "1"}, {"pos": 7, "desc": "VER DES PADRAO OU REFERENCIA 6\"-0028-P-6335-Ba IS-5250.00-6100-179-LVC-008 REG-IS-0028-P-6", "diam": "6 11", "qtde": "20"}]};
+var ROUTING={
+  "D1": [
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 630
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 3220
+    },
+    {
+      "dir": "N",
+      "mm": 2920
+    },
+    {
+      "dir": "E",
+      "mm": 5060
+    },
+    {
+      "dir": "E",
+      "mm": 840
+    },
+    {
+      "dir": "E",
+      "mm": 229
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 150
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 266
+    },
+    {
+      "dir": "U",
+      "mm": 232
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 232
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "N",
+      "mm": 2827
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 1242
+    },
+    {
+      "dir": "N",
+      "mm": 4057
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 3972
+    },
+    {
+      "dir": "N",
+      "mm": 1522
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 57
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 328
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 557
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    }
+  ],
+  "D2": [
+    {
+      "dir": "N",
+      "mm": 1055
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    },
+    {
+      "dir": "N",
+      "mm": 1265
+    },
+    {
+      "dir": "N",
+      "mm": 2165
+    },
+    {
+      "dir": "E",
+      "mm": 700
+    },
+    {
+      "dir": "U",
+      "mm": 657
+    },
+    {
+      "dir": "E",
+      "mm": 4950
+    },
+    {
+      "dir": "E",
+      "mm": 6800
+    },
+    {
+      "dir": "U",
+      "mm": 1279
+    },
+    {
+      "dir": "E",
+      "mm": 571
+    },
+    {
+      "dir": "E",
+      "mm": 6800
+    },
+    {
+      "dir": "N",
+      "mm": 2303
+    },
+    {
+      "dir": "E",
+      "mm": 571
+    },
+    {
+      "dir": "E",
+      "mm": 1840
+    }
+  ],
+  "D3": [
+    {
+      "dir": "N",
+      "mm": 811
+    },
+    {
+      "dir": "N",
+      "mm": 1585
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "E",
+      "mm": 700
+    },
+    {
+      "dir": "U",
+      "mm": 658
+    },
+    {
+      "dir": "N",
+      "mm": 378
+    },
+    {
+      "dir": "N",
+      "mm": 2206
+    },
+    {
+      "dir": "U",
+      "mm": 207
+    },
+    {
+      "dir": "N",
+      "mm": 3197
+    },
+    {
+      "dir": "U",
+      "mm": 58
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "N",
+      "mm": 4064
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4014
+    },
+    {
+      "dir": "N",
+      "mm": 3880
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4097
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 3978
+    },
+    {
+      "dir": "E",
+      "mm": 4004
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    }
+  ],
+  "D4": [
+    {
+      "dir": "N",
+      "mm": 964
+    },
+    {
+      "dir": "N",
+      "mm": 681
+    },
+    {
+      "dir": "U",
+      "mm": 681
+    },
+    {
+      "dir": "E",
+      "mm": 4308
+    },
+    {
+      "dir": "E",
+      "mm": 6080
+    },
+    {
+      "dir": "U",
+      "mm": 681
+    },
+    {
+      "dir": "U",
+      "mm": 964
+    },
+    {
+      "dir": "N",
+      "mm": 681
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 6080
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "N",
+      "mm": 467
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 937
+    },
+    {
+      "dir": "E",
+      "mm": 1762
+    }
+  ],
+  "D5": [
+    {
+      "dir": "N",
+      "mm": 627
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4021
+    },
+    {
+      "dir": "N",
+      "mm": 3996
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4064
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 3906
+    },
+    {
+      "dir": "N",
+      "mm": 192
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "U",
+      "mm": 5003
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 379
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "U",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 1423
+    },
+    {
+      "dir": "U",
+      "mm": 561
+    },
+    {
+      "dir": "U",
+      "mm": 995
+    },
+    {
+      "dir": "N",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "E",
+      "mm": 4008
+    }
+  ],
+  "D6": [
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 3372
+    },
+    {
+      "dir": "U",
+      "mm": 3383
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 4208
+    },
+    {
+      "dir": "N",
+      "mm": 3988
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4025
+    },
+    {
+      "dir": "E",
+      "mm": 2195
+    },
+    {
+      "dir": "N",
+      "mm": 2495
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 4200
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 3200
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "E",
+      "mm": 378
+    },
+    {
+      "dir": "U",
+      "mm": 1457
+    },
+    {
+      "dir": "E",
+      "mm": 3066
+    },
+    {
+      "dir": "E",
+      "mm": 2900
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "U",
+      "mm": 769
+    },
+    {
+      "dir": "N",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 2647
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 9954
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    },
+    {
+      "dir": "N",
+      "mm": 3725
+    },
+    {
+      "dir": "E",
+      "mm": 51
+    },
+    {
+      "dir": "E",
+      "mm": 2230
+    },
+    {
+      "dir": "U",
+      "mm": 1494
+    }
+  ],
+  "D7": [
+    {
+      "dir": "N",
+      "mm": 67
+    },
+    {
+      "dir": "N",
+      "mm": 68
+    },
+    {
+      "dir": "N",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 69
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 70
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 52
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 71
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 5562
+    },
+    {
+      "dir": "N",
+      "mm": 2161
+    },
+    {
+      "dir": "U",
+      "mm": 72
+    },
+    {
+      "dir": "U",
+      "mm": 53
+    },
+    {
+      "dir": "U",
+      "mm": 513
+    },
+    {
+      "dir": "N",
+      "mm": 2815
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 5980
+    },
+    {
+      "dir": "N",
+      "mm": 4890
+    },
+    {
+      "dir": "U",
+      "mm": 54
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 5110
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 55
+    },
+    {
+      "dir": "N",
+      "mm": 868
+    },
+    {
+      "dir": "E",
+      "mm": 2867
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 6439
+    },
+    {
+      "dir": "U",
+      "mm": 56
+    },
+    {
+      "dir": "E",
+      "mm": 5000
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 5450
+    },
+    {
+      "dir": "E",
+      "mm": 3822
+    },
+    {
+      "dir": "N",
+      "mm": 66
+    },
+    {
+      "dir": "E",
+      "mm": 1220
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4500
+    },
+    {
+      "dir": "U",
+      "mm": 58
+    },
+    {
+      "dir": "U",
+      "mm": 884
+    },
+    {
+      "dir": "U",
+      "mm": 5000
+    },
+    {
+      "dir": "E",
+      "mm": 3822
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 2661
+    },
+    {
+      "dir": "U",
+      "mm": 2929
+    },
+    {
+      "dir": "U",
+      "mm": 59
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 60
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 1365
+    },
+    {
+      "dir": "U",
+      "mm": 61
+    },
+    {
+      "dir": "U",
+      "mm": 5955
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 62
+    },
+    {
+      "dir": "U",
+      "mm": 6200
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 63
+    },
+    {
+      "dir": "E",
+      "mm": 6200
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 64
+    },
+    {
+      "dir": "U",
+      "mm": 3600
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 65
+    },
+    {
+      "dir": "U",
+      "mm": 3600
+    },
+    {
+      "dir": "U",
+      "mm": 1220
+    },
+    {
+      "dir": "U",
+      "mm": 4755
+    },
+    {
+      "dir": "U",
+      "mm": 4745
+    }
+  ],
+  "D8": [],
+  "D9": [
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 1897
+    },
+    {
+      "dir": "E",
+      "mm": 84
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4002
+    },
+    {
+      "dir": "E",
+      "mm": 85
+    },
+    {
+      "dir": "U",
+      "mm": 4538
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 86
+    },
+    {
+      "dir": "U",
+      "mm": 6440
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 3946
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 87
+    },
+    {
+      "dir": "U",
+      "mm": 4117
+    },
+    {
+      "dir": "E",
+      "mm": 858
+    },
+    {
+      "dir": "N",
+      "mm": 92
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 88
+    },
+    {
+      "dir": "U",
+      "mm": 6957
+    },
+    {
+      "dir": "N",
+      "mm": 5338
+    },
+    {
+      "dir": "U",
+      "mm": 3502
+    },
+    {
+      "dir": "N",
+      "mm": 90
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 89
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 4705
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 2173
+    },
+    {
+      "dir": "E",
+      "mm": 429
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 379
+    },
+    {
+      "dir": "E",
+      "mm": 371
+    },
+    {
+      "dir": "N",
+      "mm": 91
+    },
+    {
+      "dir": "U",
+      "mm": 1052
+    }
+  ],
+  "D10": [
+    {
+      "dir": "N",
+      "mm": 3449
+    },
+    {
+      "dir": "E",
+      "mm": 93
+    },
+    {
+      "dir": "U",
+      "mm": 1051
+    },
+    {
+      "dir": "U",
+      "mm": 378
+    },
+    {
+      "dir": "U",
+      "mm": 2415
+    },
+    {
+      "dir": "U",
+      "mm": 94
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "U",
+      "mm": 95
+    },
+    {
+      "dir": "E",
+      "mm": 58
+    },
+    {
+      "dir": "U",
+      "mm": 1283
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 96
+    },
+    {
+      "dir": "U",
+      "mm": 3400
+    },
+    {
+      "dir": "U",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 97
+    },
+    {
+      "dir": "U",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 98
+    },
+    {
+      "dir": "U",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 99
+    },
+    {
+      "dir": "E",
+      "mm": 3262
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 4136
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 102
+    },
+    {
+      "dir": "U",
+      "mm": 3950
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 835
+    },
+    {
+      "dir": "U",
+      "mm": 101
+    },
+    {
+      "dir": "U",
+      "mm": 103
+    },
+    {
+      "dir": "U",
+      "mm": 4059
+    },
+    {
+      "dir": "E",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 3884
+    },
+    {
+      "dir": "U",
+      "mm": 3295
+    },
+    {
+      "dir": "U",
+      "mm": 104
+    },
+    {
+      "dir": "U",
+      "mm": 3379
+    },
+    {
+      "dir": "U",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 476
+    },
+    {
+      "dir": "E",
+      "mm": 105
+    },
+    {
+      "dir": "U",
+      "mm": 3500
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4050
+    },
+    {
+      "dir": "U",
+      "mm": 106
+    },
+    {
+      "dir": "U",
+      "mm": 4000
+    },
+    {
+      "dir": "U",
+      "mm": 4749
+    },
+    {
+      "dir": "U",
+      "mm": 107
+    },
+    {
+      "dir": "U",
+      "mm": 3995
+    },
+    {
+      "dir": "U",
+      "mm": 4011
+    }
+  ],
+  "D11": [
+    {
+      "dir": "E",
+      "mm": 3989
+    },
+    {
+      "dir": "E",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 380
+    },
+    {
+      "dir": "E",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 1959
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "U",
+      "mm": 2469
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 389
+    },
+    {
+      "dir": "N",
+      "mm": 109
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 110
+    },
+    {
+      "dir": "N",
+      "mm": 2048
+    },
+    {
+      "dir": "N",
+      "mm": 111
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "E",
+      "mm": 108
+    },
+    {
+      "dir": "N",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 2358
+    },
+    {
+      "dir": "U",
+      "mm": 112
+    },
+    {
+      "dir": "N",
+      "mm": 2725
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 113
+    },
+    {
+      "dir": "N",
+      "mm": 2743
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 114
+    },
+    {
+      "dir": "N",
+      "mm": 2723
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 115
+    },
+    {
+      "dir": "N",
+      "mm": 4315
+    },
+    {
+      "dir": "N",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 116
+    },
+    {
+      "dir": "N",
+      "mm": 3770
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 117
+    },
+    {
+      "dir": "N",
+      "mm": 118
+    },
+    {
+      "dir": "U",
+      "mm": 663
+    },
+    {
+      "dir": "U",
+      "mm": 3302
+    }
+  ],
+  "D12": [
+    {
+      "dir": "U",
+      "mm": 1392
+    },
+    {
+      "dir": "E",
+      "mm": 3008
+    },
+    {
+      "dir": "E",
+      "mm": 2989
+    },
+    {
+      "dir": "U",
+      "mm": 119
+    },
+    {
+      "dir": "E",
+      "mm": 3003
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 2545
+    },
+    {
+      "dir": "U",
+      "mm": 120
+    },
+    {
+      "dir": "E",
+      "mm": 3008
+    },
+    {
+      "dir": "E",
+      "mm": 2262
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 1425
+    },
+    {
+      "dir": "U",
+      "mm": 121
+    },
+    {
+      "dir": "E",
+      "mm": 3030
+    },
+    {
+      "dir": "E",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 122
+    },
+    {
+      "dir": "E",
+      "mm": 3000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 123
+    },
+    {
+      "dir": "E",
+      "mm": 3003
+    },
+    {
+      "dir": "U",
+      "mm": 1997
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 3003
+    },
+    {
+      "dir": "U",
+      "mm": 124
+    },
+    {
+      "dir": "U",
+      "mm": 1188
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 840
+    },
+    {
+      "dir": "U",
+      "mm": 3785
+    },
+    {
+      "dir": "E",
+      "mm": 1808
+    },
+    {
+      "dir": "E",
+      "mm": 2000
+    },
+    {
+      "dir": "E",
+      "mm": 840
+    },
+    {
+      "dir": "U",
+      "mm": 125
+    },
+    {
+      "dir": "E",
+      "mm": 3000
+    },
+    {
+      "dir": "E",
+      "mm": 2997
+    },
+    {
+      "dir": "U",
+      "mm": 126
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "E",
+      "mm": 1978
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 3003
+    },
+    {
+      "dir": "U",
+      "mm": 127
+    },
+    {
+      "dir": "E",
+      "mm": 2997
+    },
+    {
+      "dir": "E",
+      "mm": 2712
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 128
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 58
+    },
+    {
+      "dir": "U",
+      "mm": 129
+    },
+    {
+      "dir": "E",
+      "mm": 4119
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 378
+    }
+  ],
+  "D13": [],
+  "D14": [
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 58
+    },
+    {
+      "dir": "E",
+      "mm": 208
+    },
+    {
+      "dir": "U",
+      "mm": 1221
+    },
+    {
+      "dir": "U",
+      "mm": 1199
+    },
+    {
+      "dir": "U",
+      "mm": 1228
+    },
+    {
+      "dir": "U",
+      "mm": 457
+    },
+    {
+      "dir": "U",
+      "mm": 4457
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 820
+    },
+    {
+      "dir": "E",
+      "mm": 3180
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 1180
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 610
+    },
+    {
+      "dir": "E",
+      "mm": 67
+    },
+    {
+      "dir": "E",
+      "mm": 476
+    },
+    {
+      "dir": "E",
+      "mm": 863
+    },
+    {
+      "dir": "E",
+      "mm": 610
+    },
+    {
+      "dir": "E",
+      "mm": 67
+    },
+    {
+      "dir": "E",
+      "mm": 95
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 3153
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    }
+  ],
+  "D15": [
+    {
+      "dir": "E",
+      "mm": 95
+    },
+    {
+      "dir": "E",
+      "mm": 1190
+    },
+    {
+      "dir": "E",
+      "mm": 1800
+    },
+    {
+      "dir": "U",
+      "mm": 1273
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 452
+    },
+    {
+      "dir": "E",
+      "mm": 1624
+    },
+    {
+      "dir": "U",
+      "mm": 149
+    },
+    {
+      "dir": "E",
+      "mm": 4231
+    },
+    {
+      "dir": "U",
+      "mm": 2986
+    },
+    {
+      "dir": "E",
+      "mm": 2151
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 543
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 2992
+    },
+    {
+      "dir": "U",
+      "mm": 1853
+    },
+    {
+      "dir": "E",
+      "mm": 1997
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    },
+    {
+      "dir": "E",
+      "mm": 3008
+    }
+  ],
+  "D16": [
+    {
+      "dir": "E",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 390
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "N",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 2358
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 380
+    },
+    {
+      "dir": "U",
+      "mm": 2725
+    },
+    {
+      "dir": "U",
+      "mm": 2048
+    },
+    {
+      "dir": "U",
+      "mm": 3302
+    },
+    {
+      "dir": "U",
+      "mm": 3000
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    }
+  ],
+  "D17": [
+    {
+      "dir": "U",
+      "mm": 228
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 4000
+    },
+    {
+      "dir": "E",
+      "mm": 208
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 58
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    }
+  ],
+  "D18": [
+    {
+      "dir": "U",
+      "mm": 329
+    },
+    {
+      "dir": "U",
+      "mm": 200
+    },
+    {
+      "dir": "U",
+      "mm": 3399
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 53
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "E",
+      "mm": 1356
+    },
+    {
+      "dir": "E",
+      "mm": 3642
+    },
+    {
+      "dir": "E",
+      "mm": 61
+    },
+    {
+      "dir": "E",
+      "mm": 4555
+    },
+    {
+      "dir": "E",
+      "mm": 62
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 6981
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 63
+    },
+    {
+      "dir": "E",
+      "mm": 5717
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 58
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 64
+    },
+    {
+      "dir": "E",
+      "mm": 4360
+    },
+    {
+      "dir": "E",
+      "mm": 207
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 65
+    },
+    {
+      "dir": "E",
+      "mm": 5986
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 66
+    },
+    {
+      "dir": "E",
+      "mm": 4992
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 67
+    },
+    {
+      "dir": "E",
+      "mm": 4939
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "E",
+      "mm": 68
+    },
+    {
+      "dir": "E",
+      "mm": 4556
+    },
+    {
+      "dir": "E",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 70
+    }
+  ],
+  "D19": [
+    {
+      "dir": "U",
+      "mm": 79
+    },
+    {
+      "dir": "U",
+      "mm": 1880
+    },
+    {
+      "dir": "U",
+      "mm": 150
+    },
+    {
+      "dir": "U",
+      "mm": 500
+    },
+    {
+      "dir": "U",
+      "mm": 1740
+    },
+    {
+      "dir": "U",
+      "mm": 80
+    },
+    {
+      "dir": "U",
+      "mm": 5415
+    },
+    {
+      "dir": "U",
+      "mm": 4745
+    },
+    {
+      "dir": "U",
+      "mm": 5850
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 4890
+    },
+    {
+      "dir": "N",
+      "mm": 2815
+    },
+    {
+      "dir": "N",
+      "mm": 1449
+    },
+    {
+      "dir": "N",
+      "mm": 4027
+    },
+    {
+      "dir": "N",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 2963
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    }
+  ],
+  "D20": [
+    {
+      "dir": "N",
+      "mm": 2377
+    },
+    {
+      "dir": "N",
+      "mm": 3218
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 5137
+    },
+    {
+      "dir": "N",
+      "mm": 1482
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "N",
+      "mm": 757
+    },
+    {
+      "dir": "N",
+      "mm": 101
+    },
+    {
+      "dir": "N",
+      "mm": 200
+    },
+    {
+      "dir": "N",
+      "mm": 3885
+    },
+    {
+      "dir": "N",
+      "mm": 95
+    },
+    {
+      "dir": "E",
+      "mm": 229
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 6000
+    },
+    {
+      "dir": "N",
+      "mm": 102
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    },
+    {
+      "dir": "N",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    }
+  ],
+  "D21": [
+    {
+      "dir": "N",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    },
+    {
+      "dir": "E",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 995
+    },
+    {
+      "dir": "E",
+      "mm": 57
+    },
+    {
+      "dir": "U",
+      "mm": 208
+    },
+    {
+      "dir": "U",
+      "mm": 1423
+    },
+    {
+      "dir": "U",
+      "mm": 228
+    },
+    {
+      "dir": "U",
+      "mm": 106
+    },
+    {
+      "dir": "U",
+      "mm": 378
+    },
+    {
+      "dir": "U",
+      "mm": 379
+    },
+    {
+      "dir": "E",
+      "mm": 922
+    },
+    {
+      "dir": "U",
+      "mm": 560
+    },
+    {
+      "dir": "E",
+      "mm": 107
+    },
+    {
+      "dir": "E",
+      "mm": 108
+    },
+    {
+      "dir": "E",
+      "mm": 3000
+    },
+    {
+      "dir": "E",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    }
+  ],
+  "D22": [
+    {
+      "dir": "N",
+      "mm": 129
+    },
+    {
+      "dir": "N",
+      "mm": 1763
+    },
+    {
+      "dir": "N",
+      "mm": 1591
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    },
+    {
+      "dir": "N",
+      "mm": 57
+    },
+    {
+      "dir": "N",
+      "mm": 208
+    },
+    {
+      "dir": "U",
+      "mm": 700
+    },
+    {
+      "dir": "N",
+      "mm": 1280
+    },
+    {
+      "dir": "N",
+      "mm": 379
+    },
+    {
+      "dir": "N",
+      "mm": 126
+    },
+    {
+      "dir": "E",
+      "mm": 964
+    },
+    {
+      "dir": "N",
+      "mm": 930
+    },
+    {
+      "dir": "E",
+      "mm": 682
+    },
+    {
+      "dir": "N",
+      "mm": 95
+    },
+    {
+      "dir": "N",
+      "mm": 119
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    },
+    {
+      "dir": "N",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 57
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    }
+  ],
+  "D23": [
+    {
+      "dir": "N",
+      "mm": 208
+    },
+    {
+      "dir": "N",
+      "mm": 58
+    },
+    {
+      "dir": "N",
+      "mm": 100
+    },
+    {
+      "dir": "N",
+      "mm": 131
+    },
+    {
+      "dir": "N",
+      "mm": 1170
+    },
+    {
+      "dir": "N",
+      "mm": 228
+    },
+    {
+      "dir": "N",
+      "mm": 2435
+    },
+    {
+      "dir": "U",
+      "mm": 2115
+    },
+    {
+      "dir": "U",
+      "mm": 614
+    },
+    {
+      "dir": "U",
+      "mm": 657
+    },
+    {
+      "dir": "U",
+      "mm": 700
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 229
+    },
+    {
+      "dir": "U",
+      "mm": 138
+    },
+    {
+      "dir": "U",
+      "mm": 6000
+    },
+    {
+      "dir": "U",
+      "mm": 100
+    },
+    {
+      "dir": "U",
+      "mm": 50
+    }
+  ]
+};
 var DEFAULT={
   meta:{obra:'PHASE-OUT DIESEL S-500 · U-0028 · REGAP',programa:'PHASE-OUT DIESEL S-500',area:'U-0028',cliente:'REGAP',prazo:''},
   desenhos:SEED.desenhos.map(function(d){d.status='lib';d.materiais=d.materiais||[];d.revs=[{r:d.rev,d:'',obs:'Conforme '+(d.iso||'')+' · folha '+(d.folha||'')}];d.spoolPos=SPOOLPOS[d.id]||{};return d;}),
@@ -612,7 +3221,7 @@ function abrirDesenho(id){
   var sp='<table class="tbl"><thead><tr><th>Spool</th><th>DN</th><th>Juntas</th><th>PD</th></tr></thead><tbody>'+
     (d.spools||[]).map(function(s){return '<tr class="clic" onclick="fechar();abrirSpool(\''+id+'\',\''+s.cod+'\')"><td class="tg">'+s.cod+'</td><td>'+s.dn+'"</td><td>'+njuntas(s)+'</td><td>'+pd(s)+'</td></tr>';}).join('')+'</tbody></table>'+
     (ed?'<button class="btn ghost" style="margin-top:10px" onclick="novoSpool(\''+id+'\')">+ Spool</button>':'');
-  var verBtn='<div class="panel"><h3>Desenho do isométrico <span style="font-size:12px;color:var(--muted);font-family:var(--body)">'+d.iso+' · folha '+d.folha+' · Rev '+d.rev+'</span></h3><button class="btn" onclick="verDesenho(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver desenho atual</button> <button class="btn ghost" onclick="imprimirDesenhoMat(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir desenho + materiais</button></div>';
+  var verBtn='<div class="panel"><h3>Desenho do isométrico <span style="font-size:12px;color:var(--muted);font-family:var(--body)">'+d.iso+' · folha '+d.folha+' · Rev '+d.rev+'</span></h3><button class="btn" onclick="verDesenho(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver desenho atual</button> <button class="btn ghost" onclick="imprimirDesenhoMat(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir desenho + materiais</button> <button class="btn ghost" onclick="abrir3D(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg>Ver 3D</button></div>';
   var supN=lineObj(d,'suportes').n;
   var supPanel='<div class="panel"><h3>Suportes da linha <span style="font-size:12px;color:var(--muted);font-family:var(--body)">após montar todos os spools · '+linePct(d,'suportes',SUP_ET)+'%</span></h3><div style="margin-bottom:10px;font-size:13px;display:flex;align-items:center;gap:8px">Nº de suportes: '+(ed?'<input type="number" min="0" value="'+supN+'" onchange="setSupN(\''+id+'\',this.value)" style="width:80px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:5px 7px">':'<b>'+supN+'</b>')+'</div>'+lineEtapasHTML(id,'suportes',SUP_ET)+'</div>';
   var testePanel='<div class="panel"><h3>Teste hidrostático <span style="font-size:12px;color:var(--muted);font-family:var(--body)">após linha + suportes · '+linePct(d,'teste',TESTE_ET)+'%</span></h3>'+lineEtapasHTML(id,'teste',TESTE_ET)+'</div>';
@@ -1026,6 +3635,41 @@ function renderEquipe(){
 
 /* ============== MODAL / EXPORT ============== */
 function fechar(){document.getElementById('modal').classList.remove('on');}
+function abrir3D(id){var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;document.getElementById('m3dt').textContent='3D — '+d.cod+' · '+d.desc;document.getElementById('m3d').classList.add('on');setTimeout(function(){build3D(id);},60);}
+function close3D(){if(window.__dispose3D)window.__dispose3D();document.getElementById('m3d').classList.remove('on');}
+function build3D(id){
+  var T=window.__three;var host=document.getElementById('m3dCanvas');
+  if(!T){host.innerHTML='<div style="color:#9ab;padding:50px;text-align:center;font-size:14px">Carregando biblioteca 3D… feche e abra novamente em alguns segundos.</div>';return;}
+  var THREE=T.THREE;if(window.__dispose3D)window.__dispose3D();host.innerHTML='';
+  var d=DB.desenhos.find(function(x){return x.id===id;});var route=(typeof ROUTING!=='undefined'&&ROUTING[id])||[];
+  if(!route.length){host.innerHTML='<div style="color:#9ab;padding:50px;text-align:center;font-size:14px">Traçado 3D não disponível para esta linha.</div>';return;}
+  var W=host.clientWidth||800,H=host.clientHeight||600;
+  var scene=new THREE.Scene();scene.background=new THREE.Color(0x0e1630);
+  var cam=new THREE.PerspectiveCamera(55,W/H,0.01,1e6);
+  var rnd=new THREE.WebGLRenderer({antialias:true});rnd.setSize(W,H);rnd.setPixelRatio(window.devicePixelRatio||1);host.appendChild(rnd.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff,0.8));var dl=new THREE.DirectionalLight(0xffffff,0.65);dl.position.set(1,2,1.5);scene.add(dl);
+  var DIR={E:[1,0,0],W:[-1,0,0],N:[0,0,1],S:[0,0,-1],U:[0,1,0],D:[0,-1,0]};
+  var pts=[new THREE.Vector3(0,0,0)],cur=new THREE.Vector3(0,0,0),cum=[0],tot=0;
+  route.forEach(function(s){var v=DIR[s.dir]||[0,0,0];var L=(s.mm||0)/1000;cur=cur.clone().add(new THREE.Vector3(v[0]*L,v[1]*L,v[2]*L));pts.push(cur.clone());tot+=L;cum.push(tot);});
+  function pAt(dist){for(var i=1;i<cum.length;i++){if(dist<=cum[i]+1e-9){var seg=(cum[i]-cum[i-1])||1;return pts[i-1].clone().lerp(pts[i],(dist-cum[i-1])/seg);}}return pts[pts.length-1].clone();}
+  var sps=(d.spools||[]);var lens=sps.map(function(sp){return Math.max(0.001,compr(sp)||1);});var sumL=lens.reduce(function(a,b){return a+b;},0)||1;
+  var group=new THREE.Group();var acc=0;var radius=Math.max(tot/350,0.04);
+  sps.forEach(function(sp,i){var a=acc/sumL*tot;acc+=lens[i];var b=acc/sumL*tot;
+    var n=Math.max(2,Math.ceil((b-a)/Math.max(0.3,tot/200)));var cp=[];for(var k=0;k<=n;k++)cp.push(pAt(a+(b-a)*k/n));
+    if(cp.length<2)return;var curve=new THREE.CatmullRomCurve3(cp);
+    var geo=new THREE.TubeGeometry(curve,Math.max(6,n*2),radius,10,false);
+    var col=spStage(sp).cor;var mat=new THREE.MeshStandardMaterial({color:col,metalness:0.25,roughness:0.6});
+    var mesh=new THREE.Mesh(geo,mat);mesh.userData={cod:sp.cod};group.add(mesh);
+  });
+  scene.add(group);
+  var box=new THREE.Box3().setFromObject(group);var ctr=box.getCenter(new THREE.Vector3());var size=box.getSize(new THREE.Vector3());group.position.sub(ctr);
+  var maxd=Math.max(size.x,size.y,size.z)||10;cam.position.set(maxd*0.9,maxd*0.7,maxd);cam.lookAt(0,0,0);
+  var ctrl=new T.OrbitControls(cam,rnd.domElement);ctrl.target.set(0,0,0);ctrl.update();
+  var leg=document.createElement('div');leg.className='m3dleg';leg.innerHTML=JSTHEAD.map(function(h,i){return '<div><i style="background:'+JSTCOR[i]+'"></i>'+h+'</div>';}).join('')+'<div><i style="background:#9aa3b8"></i>A iniciar</div>';host.appendChild(leg);
+  var raf,stop=false;function loop(){if(stop)return;raf=requestAnimationFrame(loop);ctrl.update();rnd.render(scene,cam);}loop();
+  function onR(){var w=host.clientWidth,h=host.clientHeight;cam.aspect=w/h;cam.updateProjectionMatrix();rnd.setSize(w,h);}window.addEventListener('resize',onR);
+  window.__dispose3D=function(){stop=true;cancelAnimationFrame(raf);window.removeEventListener('resize',onR);try{rnd.dispose();}catch(e){}host.innerHTML='';window.__dispose3D=null;};
+}
 var SVGNS='http://www.w3.org/2000/svg';
 var IMG_CUR=null,DRAW_SP=null,DRAW_PTS=null,MARK_SP=null,MARK_IDX=0;
 function curDes(){return DB.desenhos.find(function(x){return x.id===IMG_CUR;});}
@@ -1141,6 +3785,12 @@ function renderRDO(){
     },(e)=>console.warn('[FB] snapshot',e&&e.code||e));
     setTimeout(()=>{ if(window.__semear)window.__semear(); },2500);
   }
+</script>
+<div class="m3d" id="m3d"><div class="m3dhead"><span id="m3dt">Visualização 3D</span><button onclick="close3D()">✕ Fechar</button></div><div id="m3dCanvas"></div></div>
+<script type="module">
+  import * as THREE from 'three';
+  import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+  window.__three={THREE:THREE,OrbitControls:OrbitControls};
 </script>
 </body>
 </html>
