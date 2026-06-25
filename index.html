@@ -267,6 +267,14 @@ button,input,select,textarea{font-family:inherit}
 #m3dCanvas canvas{display:block}
 .m3dleg{position:absolute;bottom:14px;left:14px;background:rgba(10,16,36,.85);color:#cfe0ff;border-radius:8px;padding:10px 12px;font-size:12px;line-height:1.7}
 .m3dleg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:middle}
+.m3dcard{position:absolute;top:14px;left:14px;background:rgba(10,16,36,.9);border:1px solid #2a3a6a;border-left:4px solid #ef803d;border-radius:8px;padding:11px 14px;color:#cfe0ff;max-width:330px}
+.m3dcard .ct{font-family:'Oswald',sans-serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:.3px}
+.m3dcard .cl{color:#9fb3d8;font-size:12px;margin:2px 0 8px}
+.m3dcard table{width:100%;border-collapse:collapse}
+.m3dcard td{padding:2px 0;font-size:12px}
+.m3dcard td:first-child{color:#7e93bb;padding-right:16px}
+.m3dcard td:last-child{color:#dfeaff;font-weight:600}
+.m3dhead .t3dbtn{background:#1e2a52;color:#cfe0ff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px}
 </style>
 </head>
 <body data-tema="azul">
@@ -358,7 +366,7 @@ var JST=['s0','s1','s2','s3','s4','s5'];                                  /* est
 var JSTCOR=['#9aa3b8','#e8730c','#e0a32e','#1f9d4d','#2563eb','#7c4dff']; /* corte/lanç, acopl, IV+lib, solda, VT/LP, US */
 var JSTHEAD=['Corte/Lanç.','Acopl.','IV+Lib','Solda','VT/LP','US'];
 var SOLDA_IDX=3;
-var APPVER='v29';
+var APPVER='v30';
 /* Recurso por atividade: nº de etapas (peso de efetivo) que cada função executa por junta — só p/ cálculo de capacidade */
 var REC_MULT={fab:{cald:2,sold:2,insp_solda:2,insp_lp:2,insp_us:1},campo:{cald:4,sold:2,insp_solda:2,insp_lp:2,insp_us:1}};
 
@@ -3636,7 +3644,11 @@ function renderEquipe(){
 
 /* ============== MODAL / EXPORT ============== */
 function fechar(){document.getElementById('modal').classList.remove('on');}
-function abrir3D(id){var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;document.getElementById('m3dt').textContent='3D — '+d.cod+' · '+d.desc;document.getElementById('m3d').classList.add('on');setTimeout(function(){build3D(id);},60);}
+var JSTCOR3D=['#e23b3b','#e8730c','#e0a32e','#1f9d4d','#2563eb','#7c4dff'];
+function sp3DColor(sp){var f=sp.fab||{},c=sp.campo||{};var dn=function(o,et){return o[et]&&o[et].pct>=100;};var best=-1;for(var i=0;i<6;i++){if(dn(f,FAB_ET[i])||dn(c,CAMPO_ET[i]))best=i;}return best<0?'#9aa3b8':JSTCOR3D[best];}
+function makeSprite3D(THREE,text,bg,fg,scale){var fs=42,pad=14;var cv=document.createElement('canvas');var c=cv.getContext('2d');c.font='bold '+fs+'px Arial';var w=Math.ceil(c.measureText(text).width)+pad*2,h=fs+pad;cv.width=w;cv.height=h;c=cv.getContext('2d');c.font='bold '+fs+'px Arial';c.fillStyle=bg;var r=12;c.beginPath();c.moveTo(r,0);c.arcTo(w,0,w,h,r);c.arcTo(w,h,0,h,r);c.arcTo(0,h,0,0,r);c.arcTo(0,0,w,0,r);c.closePath();c.fill();c.fillStyle=fg;c.textAlign='center';c.textBaseline='middle';c.fillText(text,w/2,h/2+2);var tex=new THREE.CanvasTexture(cv);tex.minFilter=THREE.LinearFilter;var spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));spr.scale.set(scale*(w/h),scale,1);spr.renderOrder=999;return spr;}
+function toggle3D(t){if(t==='sp')window._3dSp=(window._3dSp===false);else window._3dJ=!window._3dJ;if(window._cur3d)build3D(window._cur3d);}
+function abrir3D(id){var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;window._cur3d=id;document.getElementById('m3dt').textContent='3D — '+d.cod+' · '+d.desc;document.getElementById('m3d').classList.add('on');setTimeout(function(){build3D(id);},60);}
 function close3D(){if(window.__dispose3D)window.__dispose3D();document.getElementById('m3d').classList.remove('on');}
 function build3D(id){
   var T=window.__three;var host=document.getElementById('m3dCanvas');
@@ -3654,19 +3666,26 @@ function build3D(id){
   route.forEach(function(s){var v=DIR[s.dir]||[0,0,0];var L=(s.mm||0)/1000;cur=cur.clone().add(new THREE.Vector3(v[0]*L,v[1]*L,v[2]*L));pts.push(cur.clone());tot+=L;cum.push(tot);});
   function pAt(dist){for(var i=1;i<cum.length;i++){if(dist<=cum[i]+1e-9){var seg=(cum[i]-cum[i-1])||1;return pts[i-1].clone().lerp(pts[i],(dist-cum[i-1])/seg);}}return pts[pts.length-1].clone();}
   var sps=(d.spools||[]);var lens=sps.map(function(sp){return Math.max(0.001,compr(sp)||1);});var sumL=lens.reduce(function(a,b){return a+b;},0)||1;
-  var group=new THREE.Group();var acc=0;var radius=Math.max(tot/350,0.04);
+  var group=new THREE.Group();var acc=0;var radius=Math.max(tot/350,0.04);var lblData=[];
   sps.forEach(function(sp,i){var a=acc/sumL*tot;acc+=lens[i];var b=acc/sumL*tot;
     var n=Math.max(2,Math.ceil((b-a)/Math.max(0.3,tot/200)));var cp=[];for(var k=0;k<=n;k++)cp.push(pAt(a+(b-a)*k/n));
     if(cp.length<2)return;var curve=new THREE.CatmullRomCurve3(cp);
     var geo=new THREE.TubeGeometry(curve,Math.max(6,n*2),radius,10,false);
-    var col=spStage(sp).cor;var mat=new THREE.MeshStandardMaterial({color:col,metalness:0.25,roughness:0.6});
+    var col=sp3DColor(sp);var mat=new THREE.MeshStandardMaterial({color:col,metalness:0.25,roughness:0.6});
     var mesh=new THREE.Mesh(geo,mat);mesh.userData={cod:sp.cod};group.add(mesh);
+    lblData.push({sp:sp,a:a,b:b});
   });
   scene.add(group);
   var box=new THREE.Box3().setFromObject(group);var ctr=box.getCenter(new THREE.Vector3());var size=box.getSize(new THREE.Vector3());group.position.sub(ctr);
   var maxd=Math.max(size.x,size.y,size.z)||10;cam.position.set(maxd*0.9,maxd*0.7,maxd);cam.lookAt(0,0,0);
+  var lblS=Math.max(maxd/26,0.4);
+  lblData.forEach(function(LD){
+    if(window._3dSp!==false){var p=pAt((LD.a+LD.b)/2);var ss=makeSprite3D(THREE,LD.sp.cod,'#0a1024','#ffffff',lblS*1.15);ss.position.copy(p);group.add(ss);}
+    if(window._3dJ){var js=LD.sp.juntas||[];var kk=js.length;js.forEach(function(j,ji){var jc=(j.tipo||'J').toUpperCase()==='JC';var pos=pAt(LD.a+(LD.b-LD.a)*(ji+0.5)/Math.max(1,kk));var sj=makeSprite3D(THREE,(jc?'JC':'J')+j.n,jc?'#ef803d':'#2b75e4','#ffffff',lblS*0.82);sj.position.copy(pos);group.add(sj);});}
+  });
   var ctrl=new T.OrbitControls(cam,rnd.domElement);ctrl.target.set(0,0,0);ctrl.update();
-  var leg=document.createElement('div');leg.className='m3dleg';leg.innerHTML=JSTHEAD.map(function(h,i){return '<div><i style="background:'+JSTCOR[i]+'"></i>'+h+'</div>';}).join('')+'<div><i style="background:#9aa3b8"></i>A iniciar</div>';host.appendChild(leg);
+  var leg=document.createElement('div');leg.className='m3dleg';leg.innerHTML=JSTHEAD.map(function(h,i){return '<div><i style="background:'+JSTCOR3D[i]+'"></i>'+h+'</div>';}).join('')+'<div><i style="background:#9aa3b8"></i>A iniciar</div>';host.appendChild(leg);
+  var card=document.createElement('div');card.className='m3dcard';card.innerHTML='<div class="ct">'+d.cod+'</div><div class="cl">'+(d.desc||'')+'</div><table><tr><td>Isométrico</td><td>'+(d.iso||'')+'</td></tr><tr><td>Folha</td><td>'+(d.folha||'')+'</td></tr><tr><td>Revisão</td><td>'+(d.rev||'')+'</td></tr><tr><td>Área</td><td>'+(d.area||'')+'</td></tr><tr><td>Spools</td><td>'+sps.length+'</td></tr><tr><td>Comprimento</td><td>'+tot.toFixed(1)+' m</td></tr></table>';host.appendChild(card);
   var raf,stop=false;function loop(){if(stop)return;raf=requestAnimationFrame(loop);ctrl.update();rnd.render(scene,cam);}loop();
   function onR(){var w=host.clientWidth,h=host.clientHeight;cam.aspect=w/h;cam.updateProjectionMatrix();rnd.setSize(w,h);}window.addEventListener('resize',onR);
   window.__dispose3D=function(){stop=true;cancelAnimationFrame(raf);window.removeEventListener('resize',onR);try{rnd.dispose();}catch(e){}host.innerHTML='';window.__dispose3D=null;};
@@ -3787,7 +3806,7 @@ function renderRDO(){
     setTimeout(()=>{ if(window.__semear)window.__semear(); },2500);
   }
 </script>
-<div class="m3d" id="m3d"><div class="m3dhead"><span id="m3dt">Visualização 3D</span><button onclick="close3D()">✕ Fechar</button></div><div id="m3dCanvas"></div></div>
+<div class="m3d" id="m3d"><div class="m3dhead"><span id="m3dt">Visualização 3D</span><div style="display:flex;gap:8px;align-items:center"><button class="t3dbtn" onclick="toggle3D('sp')">Nº Spool</button><button class="t3dbtn" onclick="toggle3D('j')">Juntas</button><button onclick="close3D()">✕ Fechar</button></div></div><div id="m3dCanvas"></div></div>
 <script type="module">
   import * as THREE from 'three';
   import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
