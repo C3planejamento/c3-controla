@@ -366,7 +366,7 @@ var JST=['s0','s1','s2','s3','s4','s5'];                                  /* est
 var JSTCOR=['#9aa3b8','#e8730c','#e0a32e','#1f9d4d','#2563eb','#7c4dff']; /* corte/lanç, acopl, IV+lib, solda, VT/LP, US */
 var JSTHEAD=['Corte/Lanç.','Acopl.','IV+Lib','Solda','VT/LP','US'];
 var SOLDA_IDX=3;
-var APPVER='v32';
+var APPVER='v33';
 /* Recurso por atividade: nº de etapas (peso de efetivo) que cada função executa por junta — só p/ cálculo de capacidade */
 var REC_MULT={fab:{cald:2,sold:2,insp_solda:2,insp_lp:2,insp_us:1},campo:{cald:4,sold:2,insp_solda:2,insp_lp:2,insp_us:1}};
 
@@ -3666,7 +3666,7 @@ function build3D(id){
   route.forEach(function(s){var v=DIR[s.dir]||[0,0,0];var L=(s.mm||0)/1000;cur=cur.clone().add(new THREE.Vector3(v[0]*L,v[1]*L,v[2]*L));pts.push(cur.clone());tot+=L;cum.push(tot);});
   function pAt(dist){for(var i=1;i<cum.length;i++){if(dist<=cum[i]+1e-9){var seg=(cum[i]-cum[i-1])||1;return pts[i-1].clone().lerp(pts[i],(dist-cum[i-1])/seg);}}return pts[pts.length-1].clone();}
   var sps=(d.spools||[]);var lens=sps.map(function(sp){return Math.max(0.001,compr(sp)||1);});var sumL=lens.reduce(function(a,b){return a+b;},0)||1;
-  var group=new THREE.Group();var acc=0;var radius=Math.max(tot/350,0.04);var lblData=[];
+  var group=new THREE.Group();var acc=0;var radius=Math.max(tot/130,0.14);var lblData=[];
   sps.forEach(function(sp,i){var a=acc/sumL*tot;acc+=lens[i];var b=acc/sumL*tot;
     var n=Math.max(2,Math.ceil((b-a)/Math.max(0.3,tot/200)));var cp=[];for(var k=0;k<=n;k++)cp.push(pAt(a+(b-a)*k/n));
     if(cp.length<2)return;var curve=new THREE.CatmullRomCurve3(cp);
