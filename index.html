@@ -198,7 +198,7 @@ button,input,select,textarea{font-family:inherit}
 .tvtbl th{text-align:left;color:var(--muted);text-transform:uppercase;font-size:12px;letter-spacing:1px;padding:9px 14px;border-bottom:1px solid var(--line)}
 .tvtbl td{padding:10px 14px;border-bottom:1px solid var(--line);font-weight:600}
 .tvfoot{display:flex;justify-content:space-between;padding:12px 30px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-#printhead{display:none}
+#printhead,#printDoc{display:none}
 @media print{
   .sb,.top,#tv,.modal,.toast,.filters,.btn,.maplegend,.imglegend{display:none!important}
   .main{display:block}.body{padding:0}
@@ -216,6 +216,17 @@ button,input,select,textarea{font-family:inherit}
   .ch{cursor:default!important}
   #foraPanel{display:block!important;break-before:page;break-inside:auto}
   #foraPanel .tbl tr{break-inside:avoid}
+  body.pdes #app,body.pdes .modal,body.pdes #imgmodal,body.pdes #printhead{display:none!important}
+  body.pdes #printDoc{display:block!important}
+  #printDoc .pdh{display:flex;align-items:center;gap:16px;border-bottom:3px solid #e8730c;padding-bottom:10px;margin-bottom:14px}
+  #printDoc .pdh img{height:46px}
+  #printDoc .pdco{font-family:'Oswald',sans-serif;font-weight:700;font-size:20px;color:#13244a}
+  #printDoc .pdr{margin-left:auto;text-align:right;font-size:11px;color:#333;line-height:1.5}
+  #printDoc .pdimg{width:100%;max-height:58vh;object-fit:contain;border:1px solid #ccc;margin-bottom:14px;break-inside:avoid}
+  #printDoc h3{color:#111;margin:8px 0}
+  #printDoc table{width:100%;border-collapse:collapse;font-size:11px}
+  #printDoc th,#printDoc td{border:1px solid #bbb;padding:3px 6px;text-align:left;color:#111}
+  #printDoc tr{break-inside:avoid}
 }
 /* RESPONSIVO */
 @media(max-width:900px){
@@ -279,6 +290,7 @@ button,input,select,textarea{font-family:inherit}
       </div>
     </div>
     <div id="printhead"><img id="printlogo" alt=""><div class="ph-t"><div class="ph-co">C3 Engenharia &amp; Soluções</div><div class="ph-ob">PHASE-OUT DIESEL S-500 · U-0028 · REGAP — Fabricação e Montagem de Tubulação</div></div><div class="ph-r" id="phMeta"></div></div>
+    <div id="printDoc"></div>
     <div class="body" id="body"></div>
   </div>
 </div>
@@ -483,6 +495,60 @@ function lineEtapasHTML(did,kind,ets){var d=DB.desenhos.find(function(x){return 
     return '<div class="etapa"><div class="eh"><span class="en">'+et+'</span><span class="ep" style="color:'+(p>=100?'var(--ok)':'var(--muted)')+'">'+p+'%</span></div><div class="erow">'+bar+btns+'<div class="fld"><label>Data realizada</label><input type="date" value="'+(r.real||'')+'" '+(ed?'':'disabled')+' onchange="setLineEtData(\''+did+'\',\''+kind+'\',\''+etx+'\',this.value)"></div></div></div>';
   }).join('');
 }
+/* ===== PESO DE MATERIAIS ===== */
+var PIPEW={ /* kg/m por bitola (pol) e schedule — aço carbono ASME B36.10 */
+ '1/2':{40:1.27,80:1.62,160:2.39},'3/4':{40:1.69,80:2.19,160:2.90,xxs:3.66},
+ '1':{40:2.50,80:3.24,160:4.56,xxs:5.45},'1.1/4':{40:3.39,80:4.47,160:6.36},
+ '1.1/2':{40:4.05,80:5.41,160:8.06},'2':{40:5.44,80:7.48,160:11.11,xxs:13.44},
+ '2.1/2':{40:8.63,80:11.41,160:15.98},'3':{40:11.29,80:15.27,160:21.35},
+ '4':{40:16.07,80:22.32,160:33.54},'5':{40:21.77,80:30.97},
+ '6':{40:28.26,80:42.56,160:67.56},'8':{40:42.55,80:64.64,160:103.4},
+ '10':{40:60.31,80:81.55},'12':{40:73.88,80:107.4},'14':{40:90.8},'16':{40:123.3}
+};
+var FITW={ /* kg/peça aproximado — acessórios aço carbono */
+ CURVA90:{'3/4':0.2,'1':0.4,'1.1/2':0.5,'2':0.7,'3':1.6,'4':3.0,'6':7.5,'8':15,'10':27,'12':45},
+ CURVA45:{'3/4':0.1,'1':0.2,'2':0.4,'3':0.9,'4':1.7,'6':4.0,'8':8,'10':14},
+ TE:{'3/4':0.4,'1':0.7,'1.1/2':1,'2':1.4,'3':3.2,'4':6,'6':13,'8':26,'10':45},
+ FLANGE:{'3/4':1.2,'1':1.6,'1.1/2':2.2,'2':2.7,'3':4.5,'4':6,'6':9,'8':14,'10':20},
+ FLANGECEGO:{'3/4':0.9,'1':1.3,'1.1/2':2,'2':2.5,'3':4,'4':6,'6':11,'8':18,'10':28},
+ GAVETA150:{'2':7,'3':14,'4':22,'6':45,'8':75,'10':120},
+ GAVETA800:{'3/4':2.2,'1':3.5,'1.1/2':6,'2':9},
+ MEIALUVA:{'3/4':0.4,'1':0.7,'1.1/2':1.2,'2':1.8},
+ TAMPAO:{'3/4':0.2,'1':0.35,'1.1/2':0.5,'2':0.7},
+ JUNTA:{'3/4':0.05,'1':0.06,'2':0.1,'3':0.2,'4':0.25,'6':0.35,'8':0.5,'10':0.7},
+ ESTOJO:{all:0.15}
+};
+function _dnTok(diam){var t=String(diam||'').replace(/"/g,'').split(/[\sx]+/).filter(Boolean);return (t[0]||'').replace(',','.');}
+function pesoMaterial(m){
+  var desc=(m.desc||m.it||'').toUpperCase();var dn=_dnTok(m.diam||m.un||'');
+  var q=parseFloat(String(m.qtde||m.qtd||'').replace(',','.'))||0;if(!q)return 0;
+  if(/TUBO/.test(desc)){var sch=40,ms=desc.match(/SCH\s*(\d+)/);if(ms)sch=parseInt(ms[1]);if(/XXS/.test(desc))sch='xxs';var row=PIPEW[dn];if(!row)return 0;return (row[sch]||row[40]||0)*q;}
+  function f(t){var r=FITW[t];return r?(r[dn]||r.all||0):0;}
+  if(/45\s*GRAUS|CURVA\s*45/.test(desc))return f('CURVA45')*q;
+  if(/CURVA|\bGRAUS\b|COTOVELO/.test(desc))return f('CURVA90')*q;
+  if(/CEGO/.test(desc))return f('FLANGECEGO')*q;
+  if(/FLANGE/.test(desc))return f('FLANGE')*q;
+  if(/\bTE\b/.test(desc))return f('TE')*q;
+  if(/GAVETA|GLOBO|ESFERA|RETENC|VALV|VÁLV/.test(desc))return ((/800#|800\s|800$/.test(desc))?f('GAVETA800'):f('GAVETA150'))*q;
+  if(/MEIA\s*LUVA|\bLUVA\b/.test(desc))return f('MEIALUVA')*q;
+  if(/TAMP|BUJ/.test(desc))return f('TAMPAO')*q;
+  if(/JUNTA|GAXETA|ESPIR/.test(desc))return f('JUNTA')*q;
+  if(/ESTOJO|PARAFUSO/.test(desc))return f('ESTOJO')*q;
+  return 0;
+}
+function imprimirDesenhoMat(id){
+  var d=DB.desenhos.find(function(x){return x.id===id;});if(!d)return;
+  var bom=(typeof SEEDMAT!=='undefined'&&SEEDMAT[id])||d.materiais||[];var pt=0;
+  var rows=bom.length?bom.map(function(m,i){var pw=pesoMaterial(m);pt+=pw;return '<tr><td>'+(m.pos||(i+1))+'</td><td>'+(m.desc||m.it||'')+'</td><td>'+(m.diam||m.un||'')+'</td><td>'+(m.qtde||m.qtd||'')+'</td><td>'+(pw?pw.toFixed(1):'—')+'</td></tr>';}).join('')+'<tr><td colspan="4" style="text-align:right;font-weight:700">Peso total estimado</td><td style="font-weight:700">'+pt.toFixed(1)+' kg</td></tr>':'<tr><td colspan="5">Lista de materiais não disponível nesta folha.</td></tr>';
+  var hd='<div class="pdh"><img src="'+(typeof LOGO!=='undefined'?LOGO:'')+'"><div><div class="pdco">C3 Engenharia &amp; Soluções</div><div style="font-size:11px;color:#333">PHASE-OUT DIESEL S-500 · U-0028 · REGAP — Fabricação e Montagem de Tubulação</div></div><div class="pdr"><b>'+d.cod+'</b><br>'+d.iso+' · Folha '+d.folha+'<br>Rev '+d.rev+'</div></div>';
+  var img='<img class="pdimg" src="desenhos/'+id+'.jpg" onerror="this.style.display=\'none\'">';
+  var tbl='<h3>Lista de materiais — '+d.cod+'</h3><table><thead><tr><th>Pos</th><th>Descrição</th><th>Ø (pol)</th><th>Qtd</th><th>Peso ≈ (kg)</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  document.getElementById('printDoc').innerHTML=hd+img+tbl;
+  document.body.classList.add('pdes');
+  var im=document.querySelector('#printDoc .pdimg');
+  function go(){try{window.print();}finally{document.body.classList.remove('pdes');}}
+  if(im&&!im.complete){im.onload=go;im.onerror=go;setTimeout(go,1800);}else setTimeout(go,250);
+}
 function linhaMontada(d){var ss=d.spools||[];if(!ss.length)return false;return ss.every(function(sp){return fasePct(sp,'campo')>=100;});}
 function montagemPct(d){var ss=d.spools||[];if(!ss.length)return 0;return Math.round(ss.reduce(function(a,sp){return a+fasePct(sp,'campo');},0)/ss.length);}
 function setLinePrev(did,kind,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});var o=lineObj(d,kind);var r=o.et[et]||(o.et[et]={});r.prev=val;persist();}
@@ -514,12 +580,13 @@ function abrirDesenho(id){
     d.revs.map(function(r){return '<tr><td class="tg">Rev '+r.r+'</td><td>'+fmtBR(r.d)+'</td><td>'+(r.obs||'')+'</td></tr>';}).join('')+'</tbody></table>'+
     (ed?'<button class="btn ghost" style="margin-top:10px" onclick="novaRev(\''+id+'\')">+ Nova revisão</button>':'');
   var bom=(typeof SEEDMAT!=='undefined'&&SEEDMAT[id])||d.materiais||[];
-  var mat=bom.length?'<table class="tbl"><thead><tr><th>Pos</th><th>Descrição</th><th>Ø (pol)</th><th>Qtd</th></tr></thead><tbody>'+
-    bom.map(function(m,i){return '<tr><td class="tg">'+(m.pos||(i+1))+'</td><td>'+(m.desc||m.it||'')+'</td><td>'+(m.diam||m.un||'')+'</td><td>'+(m.qtde||m.qtd||'')+'</td></tr>';}).join('')+'</tbody></table>':'<div class="empty">Lista de materiais não disponível para esta folha — veja no desenho (botão "Ver desenho atual").</div>';
-  var sp='<table class="tbl"><thead><tr><th>Spool</th><th>DN</th><th>Juntas</th><th>PD</th><th>Fab.</th><th>Campo</th></tr></thead><tbody>'+
-    (d.spools||[]).map(function(s){return '<tr class="clic" onclick="fechar();abrirSpool(\''+id+'\',\''+s.cod+'\')"><td class="tg">'+s.cod+'</td><td>'+s.dn+'"</td><td>'+njuntas(s)+'</td><td>'+pd(s)+'</td><td>'+barCell(fasePct(s,'fab'))+'</td><td>'+barCell(fasePct(s,'campo'))+'</td></tr>';}).join('')+'</tbody></table>'+
+  var pesoTot=0;
+  var mat=bom.length?'<table class="tbl"><thead><tr><th>Pos</th><th>Descrição</th><th>Ø (pol)</th><th>Qtd</th><th>Peso ≈ (kg)</th></tr></thead><tbody>'+
+    bom.map(function(m,i){var pw=pesoMaterial(m);pesoTot+=pw;return '<tr><td class="tg">'+(m.pos||(i+1))+'</td><td>'+(m.desc||m.it||'')+'</td><td>'+(m.diam||m.un||'')+'</td><td>'+(m.qtde||m.qtd||'')+'</td><td>'+(pw?pw.toFixed(1):'—')+'</td></tr>';}).join('')+'</tbody><tfoot><tr><td colspan="4" style="text-align:right;font-weight:700">Peso total estimado</td><td style="font-weight:700;color:var(--acc)">'+pesoTot.toFixed(1)+' kg</td></tr></tfoot></table><div class="vsub" style="margin-top:6px">Tubos: peso por norma (kg/m × comprimento). Acessórios/válvulas: estimativa por tabela padrão (aproximado).</div>':'<div class="empty">Lista de materiais não disponível para esta folha — veja no desenho (botão "Ver desenho atual").</div>';
+  var sp='<table class="tbl"><thead><tr><th>Spool</th><th>DN</th><th>Juntas</th><th>PD</th></tr></thead><tbody>'+
+    (d.spools||[]).map(function(s){return '<tr class="clic" onclick="fechar();abrirSpool(\''+id+'\',\''+s.cod+'\')"><td class="tg">'+s.cod+'</td><td>'+s.dn+'"</td><td>'+njuntas(s)+'</td><td>'+pd(s)+'</td></tr>';}).join('')+'</tbody></table>'+
     (ed?'<button class="btn ghost" style="margin-top:10px" onclick="novoSpool(\''+id+'\')">+ Spool</button>':'');
-  var verBtn='<div class="panel"><h3>Desenho do isométrico <span style="font-size:12px;color:var(--muted);font-family:var(--body)">'+d.iso+' · folha '+d.folha+' · Rev '+d.rev+'</span></h3><button class="btn" onclick="verDesenho(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver desenho atual</button></div>';
+  var verBtn='<div class="panel"><h3>Desenho do isométrico <span style="font-size:12px;color:var(--muted);font-family:var(--body)">'+d.iso+' · folha '+d.folha+' · Rev '+d.rev+'</span></h3><button class="btn" onclick="verDesenho(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Ver desenho atual</button> <button class="btn ghost" onclick="imprimirDesenhoMat(\''+id+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir desenho + materiais</button></div>';
   var supN=lineObj(d,'suportes').n;
   var supPanel='<div class="panel"><h3>Suportes da linha <span style="font-size:12px;color:var(--muted);font-family:var(--body)">após montar todos os spools · '+linePct(d,'suportes',SUP_ET)+'%</span></h3><div style="margin-bottom:10px;font-size:13px;display:flex;align-items:center;gap:8px">Nº de suportes: '+(ed?'<input type="number" min="0" value="'+supN+'" onchange="setSupN(\''+id+'\',this.value)" style="width:80px;background:var(--inp);border:1px solid var(--inpline);color:var(--txt);border-radius:7px;padding:5px 7px">':'<b>'+supN+'</b>')+'</div>'+lineEtapasHTML(id,'suportes',SUP_ET)+'</div>';
   var testePanel='<div class="panel"><h3>Teste hidrostático <span style="font-size:12px;color:var(--muted);font-family:var(--body)">após linha + suportes · '+linePct(d,'teste',TESTE_ET)+'%</span></h3>'+lineEtapasHTML(id,'teste',TESTE_ET)+'</div>';
