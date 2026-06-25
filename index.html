@@ -729,7 +729,7 @@ function distribuirDatas(fase,auto){
     var startW=cursorPD/capPD;cursorPD+=(j.dn||0);j.pv={};
     if(startW>dU){j.fora=true;return;}
     j.fora=false;
-    for(var i=0;i<6;i++){var dayW=startW+i*lag;var cal=Math.round(dayW*(7/diasSemana));var dt=addDias(cfg.ini,cal);if(dt>cfg.fim)dt=cfg.fim;j.pv[i]=dt;}
+    for(var i=0;i<6;i++){var dayW=Math.max(0,startW+i*lag);var cal=Math.round(dayW*(7/diasSemana));var dt=addDias(cfg.ini,cal);if(dt<cfg.ini)dt=cfg.ini;if(dt>cfg.fim)dt=cfg.fim;j.pv[i]=dt;}
   });});});
   persist();if(!auto){go('prog');toast('Datas distribuídas por junta (dentro da capacidade) ✓');}
 }
@@ -761,7 +761,7 @@ function renderProgramacao(){
     '<div class="vsub" style="margin-top:8px">Métrica: <b>PD (polegada-diâmetro) por turno por profissional</b>. Ex.: 1 soldador = 4 juntas de 4" = 16 PD/turno. Capacidade/dia = nº × PD/turno × turnos. As datas distribuem só o que <b>cabe no período</b>.</div></div>';
   var resumo='<div class="kpis">'+kpi('',(e.peso/1000).toFixed(1)+' t','Peso total')+kpi('or',e.J+e.JC,'Juntas total')+kpi('bl',e.nsp,'Spools')+kpi('',e.pdJ+e.pdJC,'PD total')+'</div>';
   var acoes='<div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:10px;flex-wrap:wrap">'+(ed?'<button class="btn ghost" onclick="distribuirDatas(\''+fase+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>Redistribuir datas</button>':'')+'<button class="btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4v-6h16v6h-2M8 14h8v8H8z"/></svg>Imprimir programação</button></div>';
-  return acoes+toggle+resumo+params+bloco+renderCrono(fase);
+  return acoes+toggle+resumo+params+bloco+renderForaList(fase)+renderCrono(fase);
 }
 function setEtPrev(did,cod,which,et,val){if(!podeEditar()){toast('Modo visualização: edição bloqueada');return;}var d=DB.desenhos.find(function(x){return x.id===did;});if(!d)return;var sp=(d.spools||[]).find(function(s){return s.cod===cod;});if(!sp)return;var o=sp[which]||(sp[which]={});var r=o[et]||(o[et]={});r.prev=val;persist();}
 function cronoEtapas(d,sp,fase){
@@ -778,6 +778,12 @@ function cronoEtapas(d,sp,fase){
 }
 function cronoToggle(did,cod){window._cronoOpen=window._cronoOpen||{};var k=did+'|'+cod;var el=document.getElementById('crono_'+k);if(el){var show=el.style.display==='none';el.style.display=show?'block':'none';window._cronoOpen[k]=show;}}
 function spoolProgramado(sp,fase){var jc=fase==='campo';return (sp.juntas||[]).some(function(j){return ((j.tipo||'J').toUpperCase()==='JC')===jc && !j.fora && j.pv && Object.keys(j.pv).length>0;});}
+function renderForaList(fase){
+  var jc=fase==='campo';var rows=[];var pdFora=0;
+  DB.desenhos.forEach(function(d){(d.spools||[]).forEach(function(sp){var js=spJuntasTipo(sp,jc);if(!js.length)return;if(spoolProgramado(sp,fase))return;var pdf=Math.round(js.reduce(function(a,j){return a+(j.dn||0);},0));pdFora+=pdf;rows.push('<tr class="clic" onclick="fechar();abrirSpool(\''+d.id+'\',\''+sp.cod+'\',\''+fase+'\')"><td class="tg">'+sp.cod+'</td><td>'+d.cod+'</td><td>'+d.desc+'</td><td>'+sp.dn+'"</td><td>'+js.length+'</td><td>'+pdf+'</td></tr>');});});
+  if(!rows.length)return '<div class="panel"><h3>Spools fora do período</h3><div class="empty">Tudo cabe no período definido. 🎉</div></div>';
+  return '<div class="panel"><h3>Spools FORA do período <span style="font-size:12px;color:var(--red);font-family:var(--body)">'+rows.length+' spools · '+pdFora+' PD não cabem na capacidade da equipe</span></h3><div class="vsub" style="margin-bottom:8px">Para incluí-los: aumente a equipe (PD/turno ou nº), os turnos/dia, ou estenda o prazo. Clique no spool para abrir.</div><table class="tbl"><thead><tr><th>Spool</th><th>Desenho</th><th>Linha</th><th>DN</th><th>Juntas '+(jc?'JC':'J')+'</th><th>PD</th></tr></thead><tbody>'+rows.join('')+'</tbody></table></div>';
+}
 function renderCrono(fase){fase=fase||'fab';
   var des=window._cronoDes||(DB.desenhos[0]&&DB.desenhos[0].id);
   var d=DB.desenhos.find(function(x){return x.id===des;})||DB.desenhos[0];if(!d)return '';
