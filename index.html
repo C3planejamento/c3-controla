@@ -366,7 +366,7 @@ var JST=['s0','s1','s2','s3','s4','s5'];                                  /* est
 var JSTCOR=['#9aa3b8','#e8730c','#e0a32e','#1f9d4d','#2563eb','#7c4dff']; /* corte/lanç, acopl, IV+lib, solda, VT/LP, US */
 var JSTHEAD=['Corte/Lanç.','Acopl.','IV+Lib','Solda','VT/LP','US'];
 var SOLDA_IDX=3;
-var APPVER='v33';
+var APPVER='v34';
 /* Recurso por atividade: nº de etapas (peso de efetivo) que cada função executa por junta — só p/ cálculo de capacidade */
 var REC_MULT={fab:{cald:2,sold:2,insp_solda:2,insp_lp:2,insp_us:1},campo:{cald:4,sold:2,insp_solda:2,insp_lp:2,insp_us:1}};
 
@@ -3045,7 +3045,7 @@ var NAV=[
   {k:'fab',t:'Fabricação',ic:'M14 7l-9 9 3 3 9-9zM14 7l3-3 3 3-3 3z'},
   {k:'campo',t:'Montagem campo',ic:'M3 21h18M5 21V10l7-5 7 5v11'},
   {k:'pintura',t:'Pintura',ic:'M3 21v-4l11-11 4 4-11 11H3zM14 4l3-3 3 3-3 3M17 7l-3-3'},
-  {k:'mapa',t:'Mapa 2D (avanço)',ic:'M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15'},
+  {k:'mapa',t:'Mapa 2D / 3D',ic:'M9 3L3 6v15l6-3 6 3 6-3V3l-6 3-6-3zM9 3v15M15 6v15'},
   {k:'inspecao',t:'Inspeções / Relatórios',ic:'M9 11l3 3 8-8M21 12a9 9 0 1 1-6-8.5'},
   {k:'rdo',t:'RDO (diário)',ic:'M8 2h8l4 4v16H4V2h4zM8 2v4h8M8 12h8M8 16h5'},
   {k:'equipe',t:'Equipe / Produtividade',ic:'M16 21v-2a4 4 0 0 0-8 0v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8'}
@@ -3055,7 +3055,7 @@ function buildNav(){
     return '<button data-k="'+n.k+'" onclick="go(\''+n.k+'\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+n.ic+'"/></svg>'+n.t+'</button>';
   }).join('');
 }
-var TITLES={painel:['Painel de Controle','Acompanhamento da fabricação e montagem em tempo real'],prog:['Programação','Capacidade × prazo: ritmo necessário e equipe (fabricação e campo)'],desenhos:['Desenhos e Revisões','Controle de isométricos, revisões e lista de materiais'],fab:['Fabricação — Oficina','Corte, acoplamento, solda, inspeção, pintura por spool'],campo:['Montagem em Campo','Recebimento, montagem, solda de campo, testes'],mapa:['Mapa de Avanço (2D)','Cada spool muda de cor conforme a etapa atual — clique para abrir'],pintura:['Pintura','Avanço de pintura por spool'],inspecao:['Inspeções / Relatórios','Inspeções por spool e relatório do dia'],relatorios:['Relatórios','Resumo do dia, previstos e atrasados'],rdo:['RDO — Relatório Diário de Obra','Atividades executadas no dia (imprimível)'],produtividade:['Produtividade','Polegada-diâmetro (PD) e avanço por período'],equipe:['Equipe / Produtividade','Efetivo da obra e produtividade (PD)']};
+var TITLES={painel:['Painel de Controle','Acompanhamento da fabricação e montagem em tempo real'],prog:['Programação','Capacidade × prazo: ritmo necessário e equipe (fabricação e campo)'],desenhos:['Desenhos e Revisões','Controle de isométricos, revisões e lista de materiais'],fab:['Fabricação — Oficina','Corte, acoplamento, solda, inspeção, pintura por spool'],campo:['Montagem em Campo','Recebimento, montagem, solda de campo, testes'],mapa:['Mapa de Avanço — 2D / 3D','Cada spool muda de cor conforme a etapa — clique no desenho (2D) ou em "Ver 3D"'],pintura:['Pintura','Avanço de pintura por spool'],inspecao:['Inspeções / Relatórios','Inspeções por spool e relatório do dia'],relatorios:['Relatórios','Resumo do dia, previstos e atrasados'],rdo:['RDO — Relatório Diário de Obra','Atividades executadas no dia (imprimível)'],produtividade:['Produtividade','Polegada-diâmetro (PD) e avanço por período'],equipe:['Equipe / Produtividade','Efetivo da obra e produtividade (PD)']};
 function go(v){
   VIEW=v;
   document.querySelectorAll('#nav button').forEach(function(b){b.classList.toggle('on',b.dataset.k===v);});
@@ -3283,7 +3283,7 @@ function renderMapa(){
   var cards=DB.desenhos.map(function(d){
     var ss=d.spools||[];if(!ss.length)return '';
     var chips=ss.map(function(sp){var s=spStage(sp);return '<button class="spchip" style="background:'+s.cor+'" title="'+sp.cod+' · '+s.lb+' · '+spoolPct(sp)+'%" onclick="event.stopPropagation();abrirSpool(\''+d.id+'\',\''+sp.cod+'\')">'+sp.cod.replace(/^SP\s*/,'')+'</button>';}).join('');
-    return '<div class="panel" style="padding:12px"><h3 style="margin-bottom:8px">'+d.cod+' <span style="font-size:11.5px;color:var(--muted);font-family:var(--body)">'+d.desc+' · '+ss.length+' spools</span></h3>'+
+    return '<div class="panel" style="padding:12px"><h3 style="margin-bottom:8px;display:flex;align-items:center;gap:8px">'+d.cod+' <span style="font-size:11.5px;color:var(--muted);font-family:var(--body)">'+d.desc+' · '+ss.length+' spools</span><button class="btn ghost" style="margin-left:auto;padding:5px 11px;font-size:12px" onclick="event.stopPropagation();abrir3D(\''+d.id+'\')"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12"/></svg> Ver 3D</button></h3>'+
       '<div style="position:relative;cursor:pointer" onclick="verDesenho(\''+d.id+'\')"><img src="desenhos/'+d.id+'.jpg" style="width:100%;display:block;border-radius:8px;border:1px solid var(--line)" onerror="this.style.display=\'none\'">'+mapaOverlay(d)+'</div>'+
       '<div class="spmap" style="margin-top:9px">'+chips+'</div></div>';
   }).join('');
